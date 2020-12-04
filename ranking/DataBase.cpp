@@ -1,7 +1,4 @@
-#include <stdio.h>
 #include "DataBase.hpp"
-
-extern "C"{
 
 int DataBase::passSqlQuery(const std::string& query) {
 
@@ -38,29 +35,61 @@ int DataBase::createDB() {
 
 	return 0;
 }
-int DataBase::createTable() {
+int DataBase::createTables() {
 
-	std::string sql = "CREATE TABLE IF NOT EXISTS GRADES("
+	std::string algorithms = "CREATE TABLE IF NOT EXISTS ALGORITHMS("
 		"ID			INTEGER PRIMARY KEY AUTOINCREMENT, "
-		"NAME		TEXT NOT NULL, "
-		"LNAME		TEXT NOT NULL, "
-		"AGE		INT NOT NULL, "
-		"ADDRESS	VARCHAR(50), "
-		"GRADE		VARCHAR(30) );";
+		"NAME		TEXT NOT NULL );";
+
+	std::string testFunctions = "CREATE TABLE IF NOT EXISTS FUNCTIONS("
+		"ID			INTEGER PRIMARY KEY AUTOINCREMENT, "
+		"NAME		TEXT NOT NULL );";
+
+	std::string outcome = "CREATE TABLE IF NOT EXISTS OUTCOME("
+		"ID			INTEGER PRIMARY KEY AUTOINCREMENT, "
+		"ID_ALGORITHM	INTEGER,"
+		"ID_FUNCTION	INTEGER,"
+		"DIMENSION	INTEGER,"
+		"BEST		DOUBLE(10,6),"
+		"WORST		DOUBLE(10,6),"
+		"MEDIAN		DOUBLE(10,6),"
+		"MEAN		DOUBLE(10,6),"
+		"STD		DOUBLE(10,6),"
+		"FOREIGN KEY(ID_ALGORITHM) REFERENCES ALGORITHMS(ID),"
+		"FOREIGN KEY(ID_FUNCTION) REFERENCES FUNCTIONS(ID)"
+		");";
 
 	try {
 		int exit = 0;
 		exit = sqlite3_open(dir, &DB);
 
 		char* messaggeError;
-		exit = sqlite3_exec(DB, sql.c_str(), NULL, 0, &messaggeError);
+		exit = sqlite3_exec(DB, algorithms.c_str(), NULL, 0, &messaggeError);
 
 		if (exit != SQLITE_OK) {
-			std::cerr << "Error Create Table" << std::endl;
+			std::cerr << "Error Create Algorithms Table" << std::endl;
 			sqlite3_free(messaggeError);
 		}
 		else
-			std::cout << "Table created Successfully" << std::endl;
+			std::cout << "Table Algorithms created Successfully" << std::endl;
+
+		exit = sqlite3_exec(DB, testFunctions.c_str(), NULL, 0, &messaggeError);
+
+		if (exit != SQLITE_OK) {
+			std::cerr << "Error Create Functions Table" << std::endl;
+			sqlite3_free(messaggeError);
+		}
+		else
+			std::cout << "Table Functions created Successfully" << std::endl;
+
+		exit = sqlite3_exec(DB, outcome.c_str(), NULL, 0, &messaggeError);
+
+		if (exit != SQLITE_OK) {
+			std::cerr << "Error Create Outcome Table" << std::endl;
+			sqlite3_free(messaggeError);
+		}
+		else
+			std::cout << "Table Outcome created Successfully" << std::endl;
 
 		sqlite3_close(DB);
 	}
@@ -71,10 +100,11 @@ int DataBase::createTable() {
 	return 0;
 }
 
+
 void DataBase::DBinit() {
 
 	createDB();
-	createTable();
+	createTables();
 
 }
 
@@ -95,6 +125,4 @@ int DataBase::callback(void* NotUsed, int argc, char** argv, char** azColName) {
 	std::cout << std::endl;
 
 	return 0;
-}
-
 }
