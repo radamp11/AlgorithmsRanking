@@ -1,0 +1,10 @@
+{% if all_algorithms %}
+    <h3>Lista dostępnych algorytmów:</h3>
+    <ul>
+        {% for alg in all_algorithms %}
+        <li> <a href="/algorithms/{{ alg.id }}">{{ alg.name }}</a></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <h3>Nie dodano jeszcze żadnego algorytmu.</h3>
+{% endif %} 

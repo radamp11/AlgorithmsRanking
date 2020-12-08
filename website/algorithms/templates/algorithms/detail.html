@@ -1,0 +1,9 @@
+{% load static %}
+
+<h3>ID: {{ algorithm.id }} </h3>
+<h3>Nazwa: {{ algorithm }}  </h3>
+<h3>Autor: {{ algorithm.author }} </h3>
+
+{% if algorithm.id == 1 %}
+    <img src="{% static 'images/turniejowa_4_50_100.png' %}"> </img>
+{% endif %}
