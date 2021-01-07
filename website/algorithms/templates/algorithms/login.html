@@ -1,0 +1,25 @@
+{% extends 'algorithms/base.html' %}
+
+{% block body %}
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-sm-12 col-md-7">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h3>Logowanie</h3>
+                        {% if error_message %}
+                            <p><strong>{{ error_message }}</strong></p>
+                        {% endif %}
+                        <a href="{% url 'algorithms:register' %}">Jesteś tu nowy? Zarejestruj się już teraz!</a>
+                        <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% include 'algorithms/form-template.html' %}
+                            <button type="submit" class="btn btn-success">Zaloguj</button>
+                          </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

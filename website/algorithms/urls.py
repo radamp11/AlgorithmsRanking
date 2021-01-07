@@ -1,9 +1,23 @@
 from django.conf.urls import url
+from django.urls import path
 from . import views
 
-urlpatterns = [
-    url(r'^$', views.index, name='index'),
+app_name = 'algorithms'
 
-    # /algorithms/123/
-    url(r'^(?P<algorithm_id>[0-9]+)/$', views.detail, name='detail')
+urlpatterns = [
+    url(r'^$', views.home, name='home'),
+
+    path('algorithms/', views.index, name='index'),
+
+    path('algorithms/<pk>/', views.DetailView.as_view(), name='detail'),
+
+    path('register/', views.UserFormView.as_view(), name='register'),
+
+    path('login/', views.LoginView.as_view(), name='login'),
+
+    path('reg-success/', views.wait, name='wait'),
+
+    path('add-algorithm/', views.AddAlgorithm.as_view(), name='add-alg'),
+
+    #path('add-algorithm/', views.addAlgView, name='add-alg'),
 ]

@@ -1,3 +1,6 @@
+{% extends 'algorithms/base.html' %}
+
+{% block body %}
 {% load static %}
 
 <h3>ID: {{ algorithm.id }} </h3>
@@ -7,3 +10,7 @@
 {% if algorithm.id == 1 %}
     <img src="{% static 'images/turniejowa_4_50_100.png' %}"> </img>
 {% endif %}
+
+<li class="visible-xs"><a href="/algorithms/" class="forums_link">Powrót</a></li>
+
+{% endblock %}

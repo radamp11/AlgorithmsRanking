@@ -8,4 +8,4 @@ django-admin.py startproject ranking .
 python3 manage.py migrate
 #python3 manage.py runserver
 #python3 manage.py makemigrations <appname>
-#python3 manage.py migrate      #actualises a database
+#python3 manage.py migrate 
