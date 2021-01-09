@@ -1,0 +1,58 @@
+Szkielet programu "Serwis do rankingowania algorytmow"
+Adam Stec, Jakub Kowalczyk
+
+
+OPIS:
+Szkielet w aktualnej wersji posiada zalazek funkcjonalnosci naszego serwisu. Jest to aplikacja zbudowana w Django, ktora korzysta z modulow napisanych w jezyku C++. Aktualnie udostepnione funkcjonalnosci: 
+1.rozpakowywanie archiwum zip oraz czytanie plikow .txt (main.cpp)
+2.rysowanie wykresow na podstawie odczytanych wartosci z plikow .txt (main.py)
+3.przykladowy test jednostkowy (testJednostkowy/)
+4.strone internetowa (website/)
+Obecnie strona internetowa zawiera tylko aplikację /algorithms/ , w której są dostępne algorytmy zapisane w domyślnej bazie danych Django (sqlite3), oraz dla jednego z nich wyświetlany jest przykładowy wykres. Na razie nie korzystaliśmy w niej z kodu w języku C++. Dodatkowo jest dostepna na serwerze pod domena http://radamp.pythonanywhere.com/algorithms/ 
+
+
+REPOZYTORIUM:
+https://github.com/radamp11/AlgorithmsRanking.git
+
+
+BIBLIOTEKI I NARZEDZIA:
+boost.python
+boost.test
+ziplib
+make
+scons
+matplotlib
+
+
+INSTALACJA I URUCHOMIENIE:
+1. "$ sudo apt install g++"
+2. "$ sudo apt-get install python3-dev"
+
+3. instalacja boost_1_74_0
+3.1 wchodzimy do rozpakowanego folderu boost
+3.2 uzywamy komendy "$ sudo ./bootstrap.sh --with-libraries=python,test --with-python-root=/usr --with-python=python3.8 --with-python-version=3.8"
+3.3 nastepnie "$ sudo ./b2 install" (instalacja w usr/local)
+
+4. lokalna instalacja ziplib za pomoca skryptu
+4.1 "$ sudo apt install make"
+4.2 "$ ./skrypt.sh"
+
+5. "$ sudo apt install scons"
+6. "$ sudo apt install python3-pip"
+7. "$ sudo pip3 install matplotlib"
+
+8. kompilacja programu
+8.1 wykonujemy komende "$ scons"
+8.2 "$ ldd szkielet.so" sprawdzamy czy system wie gdzie znajduja sie biblioteki, jezeli nie moze ich odnalezc to:
+//8.2.1 Przechodzimy do folderu etc/ld.so.conf.d
+//8.2.2 Dodajemy do pliku "x86_64-linux-gnu.conf" sciezki do naszych bibliotek, kazda w nowej linii np.
+//	/home/user//Desktop/ZPR/lib/ziplib/Bin
+//	/usr/local/lib
+//	lub tworzymy nowy plik .conf i tam umieszczamy sciezki.
+//8.2.3 wykonujemy komende "$ sudo ldconfig"
+8.2.4 przy ponownym wykonaniu komendy z punktu 5.2 powinnismy ujrzec zlokalizowane biblioteki w przeciwym wypadku wpisujemy sciezki recznie do pliku .bashrc:
+	"$ export LD_LIBRARY_PATH=/home/user//Desktop/ZPR/lib/ziplib/Bin"
+	"$ export LD_LIBRARY_PATH=/usr/local/lib"
+
+9. wykonujemy komende "./main.py" aby uruchomic program
+

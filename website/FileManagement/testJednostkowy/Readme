@@ -1,0 +1,5 @@
+Do przeprowadzenia testu potrzebna jest biblioteka boost::test
+Uruchomienie przykladowego testu:
+g++ -o test test.cc -L/usr/local/lib -lboost_unit_test_framework
+./test --log_level=test_suite
+

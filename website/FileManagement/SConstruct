@@ -1,0 +1,31 @@
+import platform, shutil
+
+e = Environment()
+
+if(platform.system() == "Linux"):
+   e.Append( CPPFLAGS = '-Wall -pedantic -pthread -Wno-long-long -w' )
+   e.Append( LINKFLAGS = '-Wall -pthread' )
+   e.Append( CPPPATH = ['/usr/include/python3.8'] )
+   e.Append( LIBPATH = ['/usr/local/lib'] )
+   e.Append( LIBS = [ 'libboost_python38' ] )
+   e.Append( LIBPATH = ['lib/ziplib/Bin'] )
+   e.Append( LIBS = ['libzip'] )
+
+   target = 'szkielet.so'
+elif(platform.system() == "Windows"):
+   e.Append( CPPFLAGS = ' /EHsc /D "WIN32" /D "_WIN32_WINNT#0x501" /D "_CONSOLE" /W4 /MD' )
+   e.Append( CPPPATH = [ 'c:/Boost/include/boost-1_74', 'C:/Python38/include' ] )
+   e.Append( LIBPATH = [ 'C:/Boost/lib', 'C:/Python38/libs', 'C:/ziplib/lib' ] )
+
+   target = 'szkielet.pyd'
+else:
+   print(platform.system() + " not supported")
+
+def build_link_to_lib( target, source, env):
+   '''tworzy link (symboliczny) do biblioteki - uzywany w serwerze'''
+   shutil.copy( str(source[0]), str(target[0]) )
+   return
+
+objects = ["main.cpp", "statistics.cpp", "archive.cpp"];
+dll = e.SharedLibrary(source = objects, target = 'szkielet' )
+e.Command(target, dll, build_link_to_lib )
