@@ -6,10 +6,29 @@
 <h3>ID: {{ algorithm.id }} </h3>
 <h3>Nazwa: {{ algorithm }}  </h3>
 <h3>Autor: {{ algorithm.author }} </h3>
+<h4>Plik: {{ algorithm.alg_file }}</h4>
+<table>
+    <tr>   
+        <th>Func.</th>
+        <th>Best</th>
+        <th>Worst</th>
+        <th>Median</th>
+        <th>Mean</th>
+        <th>Std</th>
+    </tr>
+    {% for out in algorithm.outcome_set.all %}
+        <tr>
+            <td>{{ out.function }}</td>
+            <td>{{ out.best }}</td>
+            <td>{{ out.worst }}</td>
+            <td>{{ out.median }}</td>
+            <td>{{ out.mean }}</td>
+            <td>{{ out.std }}</td>
+        </tr>
+    {% endfor %}
+</table>
 
-{% if algorithm.id == 1 %}
-    <img src="{% static 'images/turniejowa_4_50_100.png' %}"> </img>
-{% endif %}
+
 
 <li class="visible-xs"><a href="/algorithms/" class="forums_link">Powrót</a></li>
 

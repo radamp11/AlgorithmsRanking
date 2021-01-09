@@ -7,7 +7,7 @@ app_name = 'algorithms'
 urlpatterns = [
     url(r'^$', views.home, name='home'),
 
-    path('algorithms/', views.index, name='index'),
+    path('algorithms/', views.AlgorithmListView.as_view(), name='index'),
 
     path('algorithms/<pk>/', views.DetailView.as_view(), name='detail'),
 
@@ -18,6 +18,8 @@ urlpatterns = [
     path('reg-success/', views.wait, name='wait'),
 
     path('add-algorithm/', views.AddAlgorithm.as_view(), name='add-alg'),
+
+    path('logout/', views.logoutView, name='logout'),
 
     #path('add-algorithm/', views.addAlgView, name='add-alg'),
 ]

@@ -1,8 +1,10 @@
 {% extends 'algorithms/base.html' %}
 
 {% block body %}
+
+{% if user.is_authenticated %}
     <div class="container-fluid">
- 
+    
         <div class="row">
             <div class="col-sm-12 col-md-7">
                 <div class="panel panel-default">
@@ -21,4 +23,11 @@
             </div>
         </div>
     </div>
+{% else %}
+    <h3>Musisz być użytkownikiem Ewolucyjnego Rankingu, żeby móc dodawać swoje algorytmy.</h3>
+    <span>
+        <h5><a href="{% url 'algorithms:login' %}">Zaloguj się</a> lub <a  href="{% url 'algorithms:register' %}">Załóż konto</a></h5>
+    </span>
+{% endif %}
+    
 {% endblock %}
