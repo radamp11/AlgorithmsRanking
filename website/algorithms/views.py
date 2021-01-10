@@ -125,7 +125,6 @@ class LoginView(View):
     def post(self, request):
         form = self.form_class(request.POST)
 
-        #if form.is_valid():
         username = request.POST['username']
         password = request.POST['password']
 
@@ -179,8 +178,11 @@ class CompAlgView(View):
 
             fun = int(request.POST['function'])
             dim = request.POST['dimension']
+<<<<<<< HEAD
             
             print(fun, type(fun), dim, type(dim))
+=======
+>>>>>>> e7a10e3c7c097cb5007671d57932d02399839c61
 
             file_name1 = str(alg1.alg_file)
             file_name2 = str(alg2.alg_file)
@@ -198,9 +200,9 @@ class CompAlgView(View):
 
 
                 #usuwanie najwiekszych wartosci dla czytelnosci
-                while y_axis[0] > 150000:
-                   x_axis.pop( max(x_axis) )
-                   y_axis.__delitem__(0)
+                #while y_axis[0] > y_axis[1]*100:
+                #   x_axis.pop( max(x_axis) )
+                #   y_axis.__delitem__(0)
 
 
                 if x == 1:
@@ -211,7 +213,7 @@ class CompAlgView(View):
                     plt.plot( x_axis, y_axis, c='darkviolet', label="error value of   " + alg2.name )
 
             mst.use('seaborn')
-            plt.title( "dim: " + str(dim) )
+            plt.title( "dim: " + dim )
             plt.xlabel("FES")
             plt.ylabel("Mean Error Value")
             plt.ylim(bottom = -10)
@@ -219,9 +221,10 @@ class CompAlgView(View):
             plt.legend()
             fig = plt.gcf()
             fig_html = mpld3.fig_to_html( fig )
+            return render(request, self.template_name, { 'form' : form, 'fig_html' : fig_html })
+        else:
+            return render(request, self.template_name, { 'form' : form })
             #print(Outcome.objects.get() )#get(algorithm = alg1.pk, dimension = dim, function = fun))
-        return render(request, self.template_name, { 'form' : form, 'fig_html' : fig_html  })
-
 
 class RankingView(ListView):
     model = Algorithm
@@ -236,3 +239,5 @@ class RankingView(ListView):
             alg.save()
 
         return Algorithm.objects.order_by('score')
+
+        #123zpr123

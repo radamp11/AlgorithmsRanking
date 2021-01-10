@@ -42,14 +42,14 @@ vector<string> Archive::checkDimensions(){
 
 unique_ptr<string[]> Archive::separateFullName( string full_name ){
   unique_ptr<string[]> separated_name{ new string[3] };
-  size_t position, position_last, position_dot;
+  size_t position_first, position_last, position_dot;
 
-  position = full_name.find( '_' );
-  position_last = full_name.rfind( '_' );
-  position_dot = full_name.rfind( '.' );
+  position_last = full_name.find_last_of( '_' );
+  position_first = full_name.find_last_of( '_', position_last-1 );
+  position_dot = full_name.find_last_of( '.' );
 
-  separated_name[0] = full_name.substr( 0, position );
-  separated_name[1] = full_name.substr( position + 1, position_last - position - 1 );   
+  separated_name[0] = full_name.substr( 0, position_first );
+  separated_name[1] = full_name.substr( position_first + 1, position_last - position_first - 1 );   
   separated_name[2] = full_name.substr( position_last + 1, position_dot - position_last - 1 );
 
   return separated_name;
@@ -77,8 +77,7 @@ string Archive::findDelimiter(){
       }
   }
   if( last == -1 ){
-    cerr << "couldn't find delimiter";
-    exit(2);
+    throw "no_delimiter";
   }
 
   string str( ch_str );
@@ -108,7 +107,7 @@ void Archive::sortEntries(){
   
 }
 
-void Archive::readCSVData( vector<string>* vec, int entry_num, string delimiter ){
+void Archive::readCSVData( unique_ptr< vector<string> > &vec, int entry_num, string delimiter ){
   fstream file;
   string temp_str, value;
   int position;
@@ -119,7 +118,7 @@ void Archive::readCSVData( vector<string>* vec, int entry_num, string delimiter 
     getline( file, temp_str );
     if(  temp_str.length() > 1200 ){
       cerr << "blad w zapisie danych";
-      exit(1);
+      return;
     }
     while( temp_str.length() > 0 ){
       position = temp_str.find( delimiter );

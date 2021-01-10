@@ -15,30 +15,34 @@ using namespace std;
 vector<int> generateResults( string archive_name ){
   const int EXPECTED_NUMBER_OF_ENTRIES = 714;
   fstream result_file, temp_file;
+  vector<int> int_dimensions;
+
     if( FILE *test = fopen( archive_name.c_str(), "r" )) {
         fclose(test);
   } else {
         cerr << "archiwum nie istnieje";
-        exit(1);
+        return int_dimensions;
   }
 
   string result_file_name, delimiter;
   Archive archive( archive_name );
   vector<string> dimensions = archive.checkDimensions();
-  Statistics* stats = new Statistics();  //TODO errorhandling
-  vector<string>* csv_strings = new vector<string>;
+  unique_ptr< Statistics > stats { new Statistics() };  //TODO errorhandling
+  unique_ptr< vector<string> > csv_strings { new vector<string>() };
 
   delimiter = archive.findDelimiter();
   archive.extractAll();
   for( int for_dim = 0; for_dim < dimensions.size(); ++for_dim ){
-    result_file_name = "static/result_files/results" + dimensions[for_dim] + ".txt";
+    result_file_name = "results" + dimensions[for_dim] + ".txt";
     result_file.open( result_file_name, fstream::out );
 
     for( int i = 0 + for_dim; i < archive.getNumberOfEntries(); i += 4 ){
       archive.readCSVData( csv_strings, i, delimiter );
 
-      if( csv_strings->size() != EXPECTED_NUMBER_OF_ENTRIES )
-        cout<< csv_strings->size();
+      if( csv_strings->size() != EXPECTED_NUMBER_OF_ENTRIES ){
+        archive.removeAll();
+        return int_dimensions;
+      }
 
       for( int j = 0; j < csv_strings->size(); ++j )
         stats->insertValue( stod( csv_strings->at( j ) ));
@@ -55,12 +59,11 @@ vector<int> generateResults( string archive_name ){
     result_file.close();
   }
   archive.removeAll();
-  delete( csv_strings );
-  delete( stats );
-  vector<int> int_dimensions;
-  for( int i = 0; i < dimensions.size(); ++i ){
+
+  for(int i = 0; i < dimensions.size(); ++i ){
     int_dimensions.push_back( stoi( dimensions[i] ));
   }
+  
   return int_dimensions;
 }
 
@@ -119,8 +122,6 @@ vector<double> calculateConvergenceGraph( string archive_name, int benchmark_num
     mean_val = mean_val / NUMBER_OF_GENERATIONS;
     calculated_mean_values.push_back( mean_val );
   }
-    for(int i = 0; i < calculated_mean_values.size(); ++i )
-    cout<<calculated_mean_values[i]<<"\n";
 
   remove( archive.getEntry( entry_num ).c_str() );
   return calculated_mean_values;                     
@@ -140,7 +141,6 @@ BOOST_PYTHON_MODULE(szkielet)
         .def(vector_indexing_suite<std::vector<double> >());
     class_<std::vector<int> >("IntVec")
         .def(vector_indexing_suite<std::vector<int> >());
-    //def("extract", extractArchive);
     def("calculateConvergenceGraph", calculateConvergenceGraph);
     def("generateResults", generateResults);
 }
