@@ -27,7 +27,8 @@ class Outcome(models.Model):
     best = models.CharField(max_length = 30)
     worst = models.CharField(max_length = 30)
     median = models.CharField(max_length = 30)
-    mean = models.FloatField()
+    mean_float = models.FloatField()
+    mean_str = models.CharField(max_length = 30)
     std = models.CharField(max_length = 30)
 
     def __str__(self):

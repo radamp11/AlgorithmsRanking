@@ -40,13 +40,13 @@ class DetailView(DetailView):
                             elif word_number == 3:
                                 out.median = word
                             elif word_number == 4:
-                                out.mean = float(word)
+                                out.mean_str = word
+                                out.mean_float = float(word)
                             else:
                                 out.std = word
                             
                             word_number = word_number + 1
 
-                        #print(str(rownum) + '. ' + num)
                         rownum = rownum + 1
                         out.save()
                     
@@ -151,6 +151,7 @@ class CompAlgView(View):
         if form.is_valid():
             alg1 = Algorithm.objects.get(pk = request.POST['algorithm1'])
             alg2 = Algorithm.objects.get(pk = request.POST['algorithm2'])
-            print(alg1)
+            print(alg1.alg_file)
+            print(type(alg1.alg_file))
             print(type(alg2))
         return render(request, self.template_name, { 'form' : form })
