@@ -5,48 +5,54 @@ from django.views.generic import View, ListView, DetailView
 from django.views.generic.edit import CreateView
 from django.core.files import File
 from .models import Algorithm, Outcome
-from .forms import UserForm, LoginUserForm
+from .forms import UserForm, LoginUserForm, CompareAlgorithms
+
+import sys
+sys.path.append('../FileManagement/')
+
+from FileManagement import szkielet
 
 
 class DetailView(DetailView):
     model = Algorithm
     template_name = 'algorithms/detail.html'
 
-
     def get_object(self):
-
         alg = super().get_object()
 
         if not alg.counted:
-            with open('media/results30.txt', 'r') as myfile:
-                rownum = 1
-                for line in myfile:
-                    out = Outcome()
-                    out.algorithm = alg
-                    out.dimension = 30
-                    out.function = rownum
-                    word_number = 1
-                    for word in line.split():
-                        if word_number == 1:
-                            out.best = word
-                        elif word_number == 2:
-                            out.worst = word
-                        elif word_number == 3:
-                            out.median = word
-                        elif word_number == 4:
-                            out.mean = float(word)
-                        else:
-                            out.std = word
-                        
-                        word_number = word_number + 1
+            dimensions = szkielet.generateResults("media/" + str(alg.alg_file))
+            rownum = 1
+            for dim in dimensions:
+                with open('static/result_files/results' + str(dim) + '.txt', 'r') as myfile:
+                    rownum = 1
+                    for line in myfile:
+                        out = Outcome()
+                        out.algorithm = alg
+                        out.dimension = dim
+                        out.function = rownum
+                        word_number = 1
+                        for word in line.split():
+                            if word_number == 1:
+                                out.best = word
+                            elif word_number == 2:
+                                out.worst = word
+                            elif word_number == 3:
+                                out.median = word
+                            elif word_number == 4:
+                                out.mean = float(word)
+                            else:
+                                out.std = word
+                            
+                            word_number = word_number + 1
 
-                    #print(str(rownum) + '. ' + num)
-                    rownum = rownum + 1
-                    out.save()
-                alg.counted = True
-    
-        alg.save()
-        #alg.results10.close()
+                        #print(str(rownum) + '. ' + num)
+                        rownum = rownum + 1
+                        out.save()
+                    
+            alg.num_of_fun = rownum - 1
+            alg.counted = True
+            alg.save()
         return alg
 
 
@@ -56,8 +62,10 @@ class AlgorithmListView(ListView):
     def get_queryset(self):
         return Algorithm.objects.all()
 
+
 def home(request):
    return render(request, 'algorithms/home.html' )
+
 
 class UserFormView(View):
     form_class = UserForm
@@ -100,38 +108,22 @@ class LoginView(View):
     def post(self, request):
         form = self.form_class(request.POST)
 
-        #if form.is_valid():
-        username = request.POST['username']
-        password = request.POST['password']
+        if form.is_valid():
+            username = request.POST['username']
+            password = request.POST['password']
 
-        user = authenticate(request, username = username, password = password)
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                return redirect('algorithms:home')
-            else:       
-                return render(request, 'algorithms/wait-for-activate.html' )
+            user = authenticate(request, username = username, password = password)
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return redirect('algorithms:home')
+                else:       
+                    return render(request, 'algorithms/wait-for-activate.html' )
             
         return render(request, self.template_name, { 'form' : form })
 
 def wait(request):
     return render(request, 'algorithms/wait-for-activate.html' )
-
-
-#def handle_uploaded_file(f):  
-#    with open('media/'+f.name, 'wb+') as destination:  
-#        for chunk in f.chunks():  
-#            destination.write(chunk)
-
-#def addAlgView(request):  
-#    if request.method == 'POST':
-#        alg = AddAlgForm(request.POST, request.FILES)  
-#        if alg.is_valid():
-#            handle_uploaded_file(request.FILES['file'])  
-#            return HttpResponse("File uploaded successfuly")  
-#    else:  
-#        alg = AddAlgForm()  
-#        return render(request,"algorithms/add_alg.html",{'form' : alg}) 
 
 
 class AddAlgorithm(CreateView):
@@ -142,3 +134,23 @@ class AddAlgorithm(CreateView):
 def logoutView(request):
     logout(request)
     return render(request, 'algorithms/logout.html')
+
+
+class CompAlgView(View):
+    form_class = CompareAlgorithms
+    template_name = 'algorithms/compare.html'
+
+    # wyswietla formularz
+    def get(self, request):
+        form = self.form_class(None)
+        return render(request, self.template_name, { 'form' : form })
+    
+    # przetwarzanie wpisanych danych
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            alg1 = Algorithm.objects.get(pk = request.POST['algorithm1'])
+            alg2 = Algorithm.objects.get(pk = request.POST['algorithm2'])
+            print(alg1)
+            print(type(alg2))
+        return render(request, self.template_name, { 'form' : form })

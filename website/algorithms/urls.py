@@ -21,5 +21,5 @@ urlpatterns = [
 
     path('logout/', views.logoutView, name='logout'),
 
-    #path('add-algorithm/', views.addAlgView, name='add-alg'),
+    path('compare/', views.CompAlgView.as_view(), name='comp'),
 ]

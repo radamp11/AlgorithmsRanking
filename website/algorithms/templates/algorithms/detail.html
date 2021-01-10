@@ -4,19 +4,25 @@
 {% load static %}
 
 <h3>ID: {{ algorithm.id }} </h3>
-<h3>Nazwa: {{ algorithm }}  </h3>
+<h3>Nazwa: {{ algorithm.name }}  </h3>
 <h3>Autor: {{ algorithm.author }} </h3>
-<h4>Plik: {{ algorithm.alg_file }}</h4>
-<table>
-    <tr>   
-        <th>Func.</th>
-        <th>Best</th>
-        <th>Worst</th>
-        <th>Median</th>
-        <th>Mean</th>
-        <th>Std</th>
-    </tr>
+
+
     {% for out in algorithm.outcome_set.all %}
+
+        {% if out.function == 1 %}
+            <table>    
+            <h4>Wyniki dla {{ out.dimension }} wymiaru</h4>
+            <tr>   
+                <th>Func.</th>
+                <th>Best</th>
+                <th>Worst</th>
+                <th>Median</th>
+                <th>Mean</th>
+                <th>Std</th>
+            </tr>
+        {% endif %}
+        
         <tr>
             <td>{{ out.function }}</td>
             <td>{{ out.best }}</td>
@@ -25,9 +31,11 @@
             <td>{{ out.mean }}</td>
             <td>{{ out.std }}</td>
         </tr>
+        {% if out.function == algorithm.num_of_fun %}
+            </table>
+        {% endif %}
+    
     {% endfor %}
-</table>
-
 
 
 <li class="visible-xs"><a href="/algorithms/" class="forums_link">Powrót</a></li>

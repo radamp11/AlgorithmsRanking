@@ -16,3 +16,7 @@ class LoginUserForm(forms.ModelForm):
         model = User
         fields = ['username', 'password']
 
+
+class CompareAlgorithms(forms.Form):
+    algorithm1 = forms.ModelChoiceField(queryset = Algorithm.objects.all())
+    algorithm2 = forms.ModelChoiceField(queryset = Algorithm.objects.all())

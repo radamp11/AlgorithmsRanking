@@ -16,13 +16,21 @@
                         <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             {% include 'algorithms/form-template.html' %}
-                            <button type="submit" class="btn btn-success">Prześlij</button>
+                            <button id="demo" type="submit" class="btn btn-success">Prześlij</button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <h3 id="wait"></h3>
+    <script>
+        document.getElementById("demo").addEventListener("click", myFunction);
+
+        function myFunction() {
+            document.getElementById("wait").innerHTML = "Prosimy o chwilę cierpliwości. Przetwarzamy Twoje dane.";
+        }
+    </script>
 {% else %}
     <h3>Musisz być użytkownikiem Ewolucyjnego Rankingu, żeby móc dodawać swoje algorytmy.</h3>
     <span>

@@ -1,0 +1,30 @@
+{% extends 'algorithms/base.html' %}
+
+{% block body %}
+
+    <div class="container-fluid">
+    
+        <div class="row">
+            <div class="col-sm-12 col-md-7">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h3>Wybierz algorytmy do porównania:</h3>
+                        {% if error_message %}
+                            <p><strong>{{ error_message }}</strong></p>
+                        {% endif %}
+                        <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% include 'algorithms/form-template.html' %}
+                            <button id="demo" type="submit" class="btn btn-success">Prześlij</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        {% for alg in Algorithm.objects.all %}
+        <li><a class="dropdown-item" href="algorithms/{{ alg.id }}">{{ alg.name }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
