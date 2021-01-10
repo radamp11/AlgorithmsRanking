@@ -31,7 +31,7 @@ vector<int> generateResults( string archive_name ){
   delimiter = archive.findDelimiter();
   archive.extractAll();
   for( int for_dim = 0; for_dim < dimensions.size(); ++for_dim ){
-    result_file_name = "static/result_files/results" + dimensions[for_dim] + ".txt";
+    result_file_name = "results" + dimensions[for_dim] + ".txt";
     result_file.open( result_file_name, fstream::out );
 
     for( int i = 0 + for_dim; i < archive.getNumberOfEntries(); i += 4 ){
@@ -57,10 +57,12 @@ vector<int> generateResults( string archive_name ){
   archive.removeAll();
   delete( csv_strings );
   delete( stats );
+  
   vector<int> int_dimensions;
-  for( int i = 0; i < dimensions.size(); ++i ){
+  for(int i = 0; i < dimensions.size(); ++i ){
     int_dimensions.push_back( stoi( dimensions[i] ));
   }
+  
   return int_dimensions;
 }
 
@@ -126,7 +128,6 @@ BOOST_PYTHON_MODULE(szkielet)
         .def(vector_indexing_suite<std::vector<double> >());
     class_<std::vector<int> >("IntVec")
         .def(vector_indexing_suite<std::vector<int> >());
-    //def("extract", extractArchive);
     def("calculateConvergenceGraph", calculateConvergenceGraph);
     def("generateResults", generateResults);
 }

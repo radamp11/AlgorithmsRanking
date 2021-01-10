@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User 
 from django import forms
 from .models import Algorithm
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget = forms.PasswordInput)
@@ -20,5 +21,5 @@ class LoginUserForm(forms.ModelForm):
 class CompareAlgorithms(forms.Form):
     algorithm1 = forms.ModelChoiceField(queryset = Algorithm.objects.all())
     algorithm2 = forms.ModelChoiceField(queryset = Algorithm.objects.all())
-    function = forms.IntegerField()
+    function = forms.IntegerField( validators=[MinValueValidator(1), MaxValueValidator(30)] )
     dimension = forms.IntegerField()

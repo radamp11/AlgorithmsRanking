@@ -174,9 +174,9 @@ class CompAlgView(View):
 
 
                 #usuwanie najwiekszych wartosci dla czytelnosci
-                while y_axis[0] > 150000:
-                   x_axis.pop( max(x_axis) )
-                   y_axis.__delitem__(0)
+                #while y_axis[0] > y_axis[1]*100:
+                #   x_axis.pop( max(x_axis) )
+                #   y_axis.__delitem__(0)
 
                 
                 if x == 1:
@@ -195,4 +195,6 @@ class CompAlgView(View):
             plt.legend()
             fig = plt.gcf()
             fig_html = mpld3.fig_to_html( fig )
-        return render(request, self.template_name, { 'form' : form, 'fig_html' : fig_html })
+            return render(request, self.template_name, { 'form' : form, 'fig_html' : fig_html })
+        else:
+            return render(request, self.template_name, { 'form' : form })
