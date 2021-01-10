@@ -22,9 +22,5 @@
             </div>
         </div>
     </div>
-    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-        {% for alg in Algorithm.objects.all %}
-        <li><a class="dropdown-item" href="algorithms/{{ alg.id }}">{{ alg.name }}</a></li>
-        {% endfor %}
-    </ul>
+    <div> {{ fig_html | safe }} </div>
 {% endblock %}
