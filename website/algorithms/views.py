@@ -4,9 +4,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.views.generic import View, ListView, DetailView
 from django.views.generic.edit import CreateView
 from django.core.files import File
+from django.db.models import Min
 from .models import Algorithm, Outcome
 from .forms import UserForm, LoginUserForm, CompareAlgorithms
-import mpld3
+import mpld3                            # TRZEBA ZAINSTALOWAC    
 import matplotlib.pyplot as plt
 import matplotlib.style as mst
 import sys
@@ -23,9 +24,9 @@ class DetailView(DetailView):
         alg = super().get_object()
 
         if not alg.counted:
-            dimensions = szkielet.generateResults("media/" + str(alg.alg_file))
+            dims = szkielet.generateResults("media/" + str(alg.alg_file))
             rownum = 1
-            for dim in dimensions:
+            for dim in dims:
                 with open('static/result_files/results' + str(dim) + '.txt', 'r') as myfile:
                     rownum = 1
                     for line in myfile:
@@ -44,6 +45,14 @@ class DetailView(DetailView):
                             elif word_number == 4:
                                 out.mean_str = word
                                 out.mean_float = float(word)
+                                if dim == 10:
+                                    alg.SE = alg.SE + 0.1 * out.mean_float 
+                                elif dim == 30:
+                                    alg.SE = alg.SE + 0.2 * out.mean_float 
+                                elif dim == 50:
+                                    alg.SE = alg.SE + 0.3 * out.mean_float 
+                                elif dim == 100:
+                                    alg.SE = alg.SE + 0.4 * out.mean_float 
                             else:
                                 out.std = word
                             
@@ -154,8 +163,8 @@ class CompAlgView(View):
             alg1 = Algorithm.objects.get(pk = request.POST['algorithm1'])
             alg2 = Algorithm.objects.get(pk = request.POST['algorithm2'])
 
-            function = int(request.POST['function'])
-            dimension = int(request.POST['dimension'])
+            fun = int(request.POST['function'])
+            dim = int(request.POST['dimension'])
 
             file_name1 = str(alg1.alg_file)
             file_name2 = str(alg2.alg_file)
@@ -163,9 +172,9 @@ class CompAlgView(View):
             fig = plt.figure(dpi=175)
             for x in [1,2]:
                 if x == 1:
-                    mean_val = szkielet.calculateConvergenceGraph("media/" + file_name1, function, dimension)
+                    mean_val = szkielet.calculateConvergenceGraph("media/" + file_name1, fun, dim)
                 else:
-                    mean_val = szkielet.calculateConvergenceGraph("media/" + file_name2, function, dimension)
+                    mean_val = szkielet.calculateConvergenceGraph("media/" + file_name2, fun, dim)
 
                 #x_axis = [0.01, 0.02, 0.03, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
                 x_axis = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
@@ -177,7 +186,7 @@ class CompAlgView(View):
                    x_axis.pop( max(x_axis) )
                    y_axis.__delitem__(0)
 
-                
+
                 if x == 1:
                     plt.scatter( x_axis, y_axis, c='darkred', marker='o' )
                     plt.plot( x_axis, y_axis, c='black', label="error value of   " + alg1.name )
@@ -186,7 +195,7 @@ class CompAlgView(View):
                     plt.plot( x_axis, y_axis, c='darkviolet', label="error value of   " + alg2.name )
 
             mst.use('seaborn')
-            plt.title( "Dimension: " + str(dimension) )
+            plt.title( "dim: " + str(dim) )
             plt.xlabel("FES")
             plt.ylabel("Mean Error Value")
             plt.ylim(bottom = -10)
@@ -194,5 +203,20 @@ class CompAlgView(View):
             plt.legend()
             fig = plt.gcf()
             fig_html = mpld3.fig_to_html( fig )
-        return render(request, self.template_name, { 'form' : form, 'fig_html' : fig_html })
+            #print(Outcome.objects.get() )#get(algorithm = alg1.pk, dimension = dim, function = fun))
+        return render(request, self.template_name, { 'form' : form, 'fig_html' : fig_html  })
 
+
+class RankingView(ListView):
+    model = Algorithm
+    template_name = 'algorithms/ranking.html'
+
+    def get_queryset(self):
+        min_SE = Algorithm.objects.all().aggregate(Min('SE'))
+        #print(type(min_SE['SE__min']))
+        for alg in Algorithm.objects.all():
+            print(alg.SE, min_SE['SE__min'])
+            alg.score = ((1 - (alg.SE - min_SE['SE__min'])/(alg.SE)) * 50)
+            alg.save()
+
+        return Algorithm.objects.order_by('score')

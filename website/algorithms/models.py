@@ -10,14 +10,15 @@ class Algorithm(models.Model):
     alg_file = models.FileField(upload_to='zip_files/')
     counted = models.BooleanField(default = False)
     num_of_fun = models.IntegerField(default = 0)
-    #score = models.FloatField()
+    SE = models.FloatField(default = 0)
+    score = models.FloatField(default = 0)
     #rank = models.IntegerField()
 
     def get_absolute_url(self):
         return reverse('algorithms:detail', kwargs={'pk' : self.pk})
 
     def __str__(self):
-        return '{}: {}'.format(self.name, self.author)
+        return '{} : {}'.format(self.name, self.author)
 
 
 class Outcome(models.Model):

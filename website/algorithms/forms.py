@@ -20,5 +20,6 @@ class LoginUserForm(forms.ModelForm):
 class CompareAlgorithms(forms.Form):
     algorithm1 = forms.ModelChoiceField(queryset = Algorithm.objects.all())
     algorithm2 = forms.ModelChoiceField(queryset = Algorithm.objects.all())
+    #algorithm3 = forms.ModelChoiceField(queryset = Algorithm.objects.all())
     function = forms.IntegerField()
     dimension = forms.IntegerField()
