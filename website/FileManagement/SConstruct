@@ -5,11 +5,11 @@ e = Environment()
 if(platform.system() == "Linux"):
    e.Append( CPPFLAGS = '-Wall -pedantic -pthread -Wno-long-long -w' )
    e.Append( LINKFLAGS = '-Wall -pthread' )
-   e.Append( CPPPATH = ['/usr/include/python3.6'] )
+   e.Append( CPPPATH = ['/usr/include/python3.8'] )
    e.Append( LIBPATH = ['/usr/local/lib'] )
-   e.Append( LIBS = [ 'libboost_python36' ] )
-   #e.Append( LIBPATH = ['lib/ziplib/Bin'] )
-   e.Append( LIBS = ['libhellozip'] )
+   e.Append( LIBS = [ 'libboost_python38' ] )
+   e.Append( LIBPATH = ['lib/ziplib/Bin'] )
+   e.Append( LIBS = ['libzip'] )
 
    target = 'szkielet.so'
 elif(platform.system() == "Windows"):
