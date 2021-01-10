@@ -17,7 +17,7 @@ public:
     std::string getEntry( int entry_num );
     std::string findDelimiter();
     void sortEntries();
-    void readCSVData( std::vector<std::string>* vec, int entry_num, std::string delimiter );
+    void readCSVData( std::unique_ptr<std::vector<std::string>> &vec, int entry_num, std::string delimiter );
 
 private:
     int number_of_entries_;

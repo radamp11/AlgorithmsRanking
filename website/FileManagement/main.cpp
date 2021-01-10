@@ -15,18 +15,20 @@ using namespace std;
 vector<int> generateResults( string archive_name ){
   const int EXPECTED_NUMBER_OF_ENTRIES = 714;
   fstream result_file, temp_file;
+  vector<int> int_dimensions;
+
     if( FILE *test = fopen( archive_name.c_str(), "r" )) {
         fclose(test);
   } else {
         cerr << "archiwum nie istnieje";
-        exit(1);
+        return int_dimensions;
   }
 
   string result_file_name, delimiter;
   Archive archive( archive_name );
   vector<string> dimensions = archive.checkDimensions();
-  Statistics* stats = new Statistics();  //TODO errorhandling
-  vector<string>* csv_strings = new vector<string>;
+  unique_ptr< Statistics > stats { new Statistics() };  //TODO errorhandling
+  unique_ptr< vector<string> > csv_strings { new vector<string>() };
 
   delimiter = archive.findDelimiter();
   archive.extractAll();
@@ -37,8 +39,10 @@ vector<int> generateResults( string archive_name ){
     for( int i = 0 + for_dim; i < archive.getNumberOfEntries(); i += 4 ){
       archive.readCSVData( csv_strings, i, delimiter );
 
-      if( csv_strings->size() != EXPECTED_NUMBER_OF_ENTRIES )
-        cout<< csv_strings->size();
+      if( csv_strings->size() != EXPECTED_NUMBER_OF_ENTRIES ){
+        archive.removeAll();
+        return int_dimensions;
+      }
 
       for( int j = 0; j < csv_strings->size(); ++j )
         stats->insertValue( stod( csv_strings->at( j ) ));
@@ -55,10 +59,7 @@ vector<int> generateResults( string archive_name ){
     result_file.close();
   }
   archive.removeAll();
-  delete( csv_strings );
-  delete( stats );
-  
-  vector<int> int_dimensions;
+
   for(int i = 0; i < dimensions.size(); ++i ){
     int_dimensions.push_back( stoi( dimensions[i] ));
   }
@@ -69,32 +70,47 @@ vector<int> generateResults( string archive_name ){
 
 
 
-vector<double> calculateConvergenceGraph( string archive_name, int benchmark_number, int dimension_idx ){  //trzeba dorobic chyba ze od razu z pliku (podaje sie nazwe pliku aby)
+vector<double> calculateConvergenceGraph( string archive_name, int benchmark_number, string dimension ){  //trzeba dorobic chyba ze od razu z pliku (podaje sie nazwe pliku aby)
   const int NUMBER_OF_GENERATIONS = 51, MAX_FES_TYPES = 14; //51 * 14 = 714
-  
+  vector<double> calculated_mean_values;
+
   if( FILE *test = fopen( archive_name.c_str(), "r" )) {
         fclose(test);
   } else {
         cerr << "archiwum nie istnieje";
-        exit(1);
+        return calculated_mean_values;
   }
 
   Archive archive( archive_name );
   vector<string> dimensions = archive.checkDimensions();
-  if( dimension_idx >= dimensions.size() || dimension_idx < 0 )
-    exit(1);
-  if( benchmark_number > archive.getNumberOfEntries() / dimensions.size() || benchmark_number < 1 )
-    exit(1);
+  int dimension_idx = -1;
+  for( int i = 0; i < dimensions.size(); ++i )
+    if( dimensions[i] == dimension )
+      dimension_idx = i;
+  
+    if( dimension_idx >= dimensions.size() || dimension_idx < 0 ){
+      cerr << " Niewlasciwe dimension, zmieniam wartosc na dozwolona";
+      dimension_idx = 0;
+    } 
+    if( benchmark_number > archive.getNumberOfEntries() / dimensions.size() || benchmark_number < 1 ){
+      cerr << " Niewlasciwy benchmark number, zmieniam wartosc na dozwolona";
+      benchmark_number = 1;
+    }
 
   int entry_num = ( benchmark_number-1 ) * dimensions.size() + dimension_idx;
 
 
   string delimiter;
   double mean_val = 0;
-  vector<double> calculated_mean_values;
-  vector<string>* csv_strings = new vector<string>;
+  unique_ptr< vector<string> > csv_strings { new vector<string>() };
 
-  delimiter = archive.findDelimiter();
+  try{
+    delimiter = archive.findDelimiter();
+  } catch ( string str ){
+    cerr << "couldn't find delimiter";
+    return calculated_mean_values;
+  }
+
   archive.extract( entry_num );
   
   archive.readCSVData( csv_strings, entry_num, delimiter );
@@ -106,11 +122,8 @@ vector<double> calculateConvergenceGraph( string archive_name, int benchmark_num
     mean_val = mean_val / NUMBER_OF_GENERATIONS;
     calculated_mean_values.push_back( mean_val );
   }
-    for(int i = 0; i < calculated_mean_values.size(); ++i )
-    cout<<calculated_mean_values[i]<<"\n";
 
   remove( archive.getEntry( entry_num ).c_str() );
-  delete( csv_strings );
   return calculated_mean_values;                     
 }
 

@@ -11,24 +11,24 @@
     {% for out in algorithm.outcome_set.all %}
 
         {% if out.function == 1 %}
-            <table>    
+            <table class="table table-striped table-hover table-bordered">
             <h4>Wyniki dla {{ out.dimension }} wymiaru</h4>
-            <tr>   
-                <th>Func.</th>
-                <th>Best</th>
-                <th>Worst</th>
-                <th>Median</th>
-                <th>Mean</th>
-                <th>Std</th>
-            </tr>
+                <tr class="table table-striped table-hover">   
+                    <th>Func.</th>
+                    <th>Best</th>
+                    <th>Worst</th>
+                    <th>Median</th>
+                    <th>Mean</th>
+                    <th>Std</th>
+                </tr>
         {% endif %}
         
-        <tr>
+        <tr class="table table-striped table-hover">
             <td>{{ out.function }}</td>
             <td>{{ out.best }}</td>
             <td>{{ out.worst }}</td>
             <td>{{ out.median }}</td>
-            <td>{{ out.mean }}</td>
+            <td>{{ out.mean_str }}</td>
             <td>{{ out.std }}</td>
         </tr>
         {% if out.function == algorithm.num_of_fun %}

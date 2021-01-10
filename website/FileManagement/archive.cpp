@@ -77,8 +77,7 @@ string Archive::findDelimiter(){
       }
   }
   if( last == -1 ){
-    cerr << "couldn't find delimiter";
-    exit(2);
+    throw "no_delimiter";
   }
 
   string str( ch_str );
@@ -108,7 +107,7 @@ void Archive::sortEntries(){
   
 }
 
-void Archive::readCSVData( vector<string>* vec, int entry_num, string delimiter ){
+void Archive::readCSVData( unique_ptr< vector<string> > &vec, int entry_num, string delimiter ){
   fstream file;
   string temp_str, value;
   int position;
@@ -119,7 +118,7 @@ void Archive::readCSVData( vector<string>* vec, int entry_num, string delimiter 
     getline( file, temp_str );
     if(  temp_str.length() > 1200 ){
       cerr << "blad w zapisie danych";
-      exit(1);
+      return;
     }
     while( temp_str.length() > 0 ){
       position = temp_str.find( delimiter );

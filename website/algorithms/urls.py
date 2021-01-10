@@ -22,4 +22,6 @@ urlpatterns = [
     path('logout/', views.logoutView, name='logout'),
 
     path('compare/', views.CompAlgView.as_view(), name='comp'),
+
+    path('ranking/', views.RankingView.as_view(), name='ranking'),
 ]
