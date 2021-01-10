@@ -1,9 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
-from django.views.generic import View, ListView, DetailView
+from django.views.generic import View, ListView, DetailView, DeleteView
 from django.views.generic.edit import CreateView
 from django.core.files import File
+from django.urls import reverse_lazy
 from django.db.models import Min
 from .models import Algorithm, Outcome
 from .forms import UserForm, LoginUserForm, CompareAlgorithms
@@ -22,9 +23,14 @@ class DetailView(DetailView):
 
     def get_object(self):
         alg = super().get_object()
-
+        #return HttpResponseRedirect('algorithms:delete')
+        #return HttpResponse('<h3>elo śmieciu</h3>')
+        
         if not alg.counted:
             dims = szkielet.generateResults("media/" + str(alg.alg_file))
+            #if dims.__len__() == 4:
+            #    alg.delete()
+            #    return alg
             rownum = 1
             for dim in dims:
                 with open('static/result_files/results' + str(dim) + '.txt', 'r') as myfile:
@@ -119,17 +125,17 @@ class LoginView(View):
     def post(self, request):
         form = self.form_class(request.POST)
 
-        if form.is_valid():
-            username = request.POST['username']
-            password = request.POST['password']
+        #if form.is_valid():
+        username = request.POST['username']
+        password = request.POST['password']
 
-            user = authenticate(request, username = username, password = password)
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    return redirect('algorithms:home')
-                else:       
-                    return render(request, 'algorithms/wait-for-activate.html' )
+        user = authenticate(request, username = username, password = password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return redirect('algorithms:home')
+            else:       
+                return render(request, 'algorithms/wait-for-activate.html' )
             
         return render(request, self.template_name, { 'form' : form })
 
@@ -140,6 +146,14 @@ def wait(request):
 class AddAlgorithm(CreateView):
     model = Algorithm
     fields = ['name', 'author', 'alg_file']
+
+
+#class DeleteAlgorithm(DeleteView):
+#    model = Algorithm
+#    success_url = reverse_lazy('algorithms:delete')
+
+def delete(request):
+    return render(request, 'algorithms/delete.html')
 
 
 def logoutView(request):
@@ -164,7 +178,9 @@ class CompAlgView(View):
             alg2 = Algorithm.objects.get(pk = request.POST['algorithm2'])
 
             fun = int(request.POST['function'])
-            dim = int(request.POST['dimension'])
+            dim = request.POST['dimension']
+            
+            print(fun, type(fun), dim, type(dim))
 
             file_name1 = str(alg1.alg_file)
             file_name2 = str(alg2.alg_file)
@@ -213,9 +229,9 @@ class RankingView(ListView):
 
     def get_queryset(self):
         min_SE = Algorithm.objects.all().aggregate(Min('SE'))
-        #print(type(min_SE['SE__min']))
+        print(min_SE['SE__min'])
         for alg in Algorithm.objects.all():
-            print(alg.SE, min_SE['SE__min'])
+            print(alg.SE)
             alg.score = ((1 - (alg.SE - min_SE['SE__min'])/(alg.SE)) * 50)
             alg.save()
 

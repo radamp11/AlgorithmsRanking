@@ -17,9 +17,16 @@ class LoginUserForm(forms.ModelForm):
         fields = ['username', 'password']
 
 
+CHOICES =( 
+    ("10", "10"), 
+    ("30", "30"), 
+    ("50", "50"), 
+    ("100", "100"), 
+    ) 
+
 class CompareAlgorithms(forms.Form):
     algorithm1 = forms.ModelChoiceField(queryset = Algorithm.objects.all())
     algorithm2 = forms.ModelChoiceField(queryset = Algorithm.objects.all())
     #algorithm3 = forms.ModelChoiceField(queryset = Algorithm.objects.all())
     function = forms.IntegerField()
-    dimension = forms.IntegerField()
+    dimension = forms.ChoiceField(choices = CHOICES)

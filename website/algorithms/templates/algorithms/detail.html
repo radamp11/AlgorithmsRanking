@@ -3,41 +3,44 @@
 {% block body %}
 {% load static %}
 
-<h3>ID: {{ algorithm.id }} </h3>
-<h3>Nazwa: {{ algorithm.name }}  </h3>
-<h3>Autor: {{ algorithm.author }} </h3>
-
+{% if algorithm.id is not None %}
+    <h3>ID: {{ algorithm.id }} </h3>
+    <h3>Nazwa: {{ algorithm.name }}  </h3>
+    <h3>Autor: {{ algorithm.author }} </h3>
 
     {% for out in algorithm.outcome_set.all %}
 
         {% if out.function == 1 %}
             <table class="table table-striped table-hover table-bordered">
-            <h4>Wyniki dla {{ out.dimension }} wymiaru</h4>
-                <tr class="table table-striped table-hover">   
-                    <th>Func.</th>
-                    <th>Best</th>
-                    <th>Worst</th>
-                    <th>Median</th>
-                    <th>Mean</th>
-                    <th>Std</th>
-                </tr>
+                <h4>Wyniki dla {{ out.dimension }} wymiaru</h4>
+                    <tr class="table table-striped table-hover">   
+                        <th>Func.</th>
+                        <th>Best</th>
+                        <th>Worst</th>
+                        <th>Median</th>
+                        <th>Mean</th>
+                        <th>Std</th>
+                    </tr>
         {% endif %}
-        
-        <tr class="table table-striped table-hover">
-            <td>{{ out.function }}</td>
-            <td>{{ out.best }}</td>
-            <td>{{ out.worst }}</td>
-            <td>{{ out.median }}</td>
-            <td>{{ out.mean_str }}</td>
-            <td>{{ out.std }}</td>
-        </tr>
+            
+                <tr class="table table-striped table-hover">
+                    <td>{{ out.function }}</td>
+                    <td>{{ out.best }}</td>
+                    <td>{{ out.worst }}</td>
+                    <td>{{ out.median }}</td>
+                    <td>{{ out.mean_str }}</td>
+                    <td>{{ out.std }}</td>
+                </tr>
         {% if out.function == algorithm.num_of_fun %}
             </table>
         {% endif %}
-    
-    {% endfor %}
-
-
-<li class="visible-xs"><a href="/algorithms/" class="forums_link">Powrót</a></li>
+        
+        {% endfor %}
+        <li class="visible-xs"><a href="/algorithms/" class="forums_link">Powrót</a></li>
+{% else %}
+    <h3>Coś poszło nie tak z dodaniem Twojego algorytmu.</h3>
+    <h3>Upewnij się, że Twój plik .zip spełnia wymagania i spróbuj ponownie.</h3>
+    <a href="{% url 'algorithms:home' %}">Wróć do strony głównej</a>
+{% endif %}
 
 {% endblock %}

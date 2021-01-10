@@ -1,0 +1,7 @@
+{% extends 'algorithms/base.html' %}
+
+{% block body %}
+<h3>Coś poszło nie tak z dodaniem Twojego algorytmu.</h3>
+<h3>Upewnij się, że Twój plik .zip spełnia wymagania i spróbuj ponownie.</h3>
+<a href="{% url 'algorithms:home' %}">Wróć do strony głównej</a>
+{% endblock %}
