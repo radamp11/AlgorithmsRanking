@@ -24,8 +24,16 @@ vector<int> generateResults( string archive_name ){
         return int_dimensions;
   }
 
-  string result_file_name, delimiter;
+
+
   Archive archive( archive_name );
+  if( !archive.validate() ){
+    cerr << "archiwum nie zawiera odpowiednich plikow";
+    return int_dimensions;
+  }
+
+
+  string result_file_name, delimiter;
   vector<string> dimensions = archive.checkDimensions();
   unique_ptr< Statistics > stats { new Statistics() };  //TODO errorhandling
   unique_ptr< vector<string> > csv_strings { new vector<string>() };
@@ -41,6 +49,7 @@ vector<int> generateResults( string archive_name ){
 
       if( csv_strings->size() != EXPECTED_NUMBER_OF_ENTRIES ){
         archive.removeAll();
+        cerr << "pliki zawarte w archiwum sa bledne";
         return int_dimensions;
       }
 
@@ -81,6 +90,7 @@ vector<double> calculateConvergenceGraph( string archive_name, int benchmark_num
         return calculated_mean_values;
   }
 
+
   Archive archive( archive_name );
   vector<string> dimensions = archive.checkDimensions();
   int dimension_idx = -1;
@@ -107,12 +117,11 @@ vector<double> calculateConvergenceGraph( string archive_name, int benchmark_num
   try{
     delimiter = archive.findDelimiter();
   } catch ( string str ){
-    cerr << "couldn't find delimiter";
+    cerr << "nie udalo sie znalezc delimitera";
     return calculated_mean_values;
   }
 
   archive.extract( entry_num );
-  
   archive.readCSVData( csv_strings, entry_num, delimiter );
   if( csv_strings->size() != NUMBER_OF_GENERATIONS * MAX_FES_TYPES )   
     cerr << "niepelny plik csv";
