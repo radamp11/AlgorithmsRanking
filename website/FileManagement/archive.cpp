@@ -9,10 +9,7 @@ using namespace std;
 Archive::Archive( string archive_name ) : archive_name_(archive_name){
   ZipArchive::Ptr archive = ZipFile::Open( archive_name );
   number_of_entries_ = archive->GetEntriesCount();
-  if( number_of_entries_ != 120 )                                     //TODO errorhandling
-    cerr << "archive doesn't possess 120 entries";
   
-
   for( int i = 0; i < number_of_entries_; ++i ){  
     auto entry = archive->GetEntry(i);
     entry_name_.push_back( entry->GetFullName() );
@@ -132,6 +129,27 @@ void Archive::readCSVData( unique_ptr< vector<string> > &vec, int entry_num, str
     }
   }
   file.close();
+}
+
+bool Archive::validate(){
+  unique_ptr<string[]> separated_name, temp_name;
+  int num_of_fun = 0, num_of_dim = 0;
+  bool counting_fun = true;
+
+  separated_name = separateFullName( entry_name_[0] );
+  for( int i = 1; counting_fun && i < number_of_entries_; ++i ){
+    temp_name = separateFullName( entry_name_[i] );
+    if( temp_name[1] == separated_name[1] ){
+      counting_fun = false;
+      num_of_fun = i;
+    }
+  }
+
+  num_of_dim = checkDimensions().size();
+
+  if( num_of_dim * num_of_fun != number_of_entries_ )
+    return false;
+  return true;
 }
 
 void Archive::extractAll(){

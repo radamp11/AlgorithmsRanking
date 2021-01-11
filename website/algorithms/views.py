@@ -29,9 +29,9 @@ class DetailView(DetailView):
         
         if not alg.counted:
             dims = szkielet.generateResults("media/" + str(alg.alg_file))
-            #if dims.__len__() == 4:
-            #    alg.delete()
-            #    return alg
+            if dims.__len__() == 0:
+                alg.delete()
+                return alg
             rownum = 1
             for dim in dims:
                 with open('static/result_files/results' + str(dim) + '.txt', 'r') as myfile:
@@ -190,16 +190,12 @@ class CompAlgView(View):
                 else:
                     mean_val = szkielet.calculateConvergenceGraph("media/" + file_name2, fun, dim)
 
+                if mean_val.__len__() == 0:
+                    return render(request, self.template_name, { 'form' : "Blad przy pobieraniu wynikow z archiwum" })
+
                 #x_axis = [0.01, 0.02, 0.03, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
                 x_axis = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
                 y_axis = mean_val
-
-
-                #usuwanie najwiekszych wartosci dla czytelnosci
-                #while y_axis[0] > y_axis[1]*100:
-                #   x_axis.pop( max(x_axis) )
-                #   y_axis.__delitem__(0)
-
 
                 if x == 1:
                     plt.scatter( x_axis, y_axis, c='darkred', marker='o' )

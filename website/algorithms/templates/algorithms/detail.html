@@ -13,7 +13,7 @@
         {% if out.function == 1 %}
             <table class="table table-striped table-hover table-bordered">
                 <h4>Wyniki dla {{ out.dimension }} wymiaru</h4>
-                    <tr class="table table-striped table-hover">   
+                    <tr class="table table-striped table-hover">
                         <th>Func.</th>
                         <th>Best</th>
                         <th>Worst</th>
@@ -22,7 +22,6 @@
                         <th>Std</th>
                     </tr>
         {% endif %}
-            
                 <tr class="table table-striped table-hover">
                     <td>{{ out.function }}</td>
                     <td>{{ out.best }}</td>
@@ -34,7 +33,6 @@
         {% if out.function == algorithm.num_of_fun %}
             </table>
         {% endif %}
-        
         {% endfor %}
         <li class="visible-xs"><a href="/algorithms/" class="forums_link">Powrót</a></li>
 {% else %}
