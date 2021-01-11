@@ -23,5 +23,38 @@
         </div>
     </div>
     <div> {{ fig_html | safe }} </div>
+    <div> {{ box_html | safe }} </div>
+    <div>
+        <table class="table table-striped table-hover table-bordered">
 
+                <tr class="table table-striped table-hover">   
+                    <th>Algorithm</th>
+                    <th>Best</th>
+                    <th>Worst</th>
+                    <th>Median</th>
+                    <th>Mean</th>
+                    <th>Std</th>
+                </tr>
+        
+            <tr class="table table-striped table-hover">
+                <td>{{ out1.algorithm }}</td>
+                <td>{{ out1.best }}</td>
+                <td>{{ out1.worst }}</td>
+                <td>{{ out1.median }}</td>
+                <td>{{ out1.mean_str }}</td>
+                <td>{{ out1.std }}</td>
+            </tr>
+
+            <tr class="table table-striped table-hover">
+                <td>{{ out2.algorithm }}</td>
+                <td>{{ out2.best }}</td>
+                <td>{{ out2.worst }}</td>
+                <td>{{ out2.median }}</td>
+                <td>{{ out2.mean_str }}</td>
+                <td>{{ out2.std }}</td>
+            </tr>
+
+        </table>
+
+    </div>
 {% endblock %}

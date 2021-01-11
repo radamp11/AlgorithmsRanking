@@ -9,6 +9,7 @@ from django.db.models import Min
 from .models import Algorithm, Outcome
 from .forms import UserForm, LoginUserForm, CompareAlgorithms
 import mpld3                            # TRZEBA ZAINSTALOWAC    
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.style as mst
 import sys
@@ -178,11 +179,6 @@ class CompAlgView(View):
 
             fun = int(request.POST['function'])
             dim = request.POST['dimension']
-<<<<<<< HEAD
-            
-            print(fun, type(fun), dim, type(dim))
-=======
->>>>>>> e7a10e3c7c097cb5007671d57932d02399839c61
 
             file_name1 = str(alg1.alg_file)
             file_name2 = str(alg2.alg_file)
@@ -221,7 +217,26 @@ class CompAlgView(View):
             plt.legend()
             fig = plt.gcf()
             fig_html = mpld3.fig_to_html( fig )
-            return render(request, self.template_name, { 'form' : form, 'fig_html' : fig_html })
+
+            plt.clf()
+            # Fixing random state for reproducibility
+            np.random.seed(19680801)
+
+            # fake up some data
+            spread = np.random.rand(50) * 100
+            center = np.ones(25) * 50
+            flier_high = np.random.rand(10) * 100 + 100
+            flier_low = np.random.rand(10) * -100
+            data = np.concatenate((spread, center, flier_high, flier_low))
+            plt.title("Boxplot")
+            plt.boxplot(data)
+            fig = plt.gcf()
+            box_html = mpld3.fig_to_html( fig )
+            #plt.show()
+
+            out1 = Outcome.objects.get(algorithm = alg1.pk, dimension = int(dim), function = fun)
+            out2 = Outcome.objects.get(algorithm = alg2.pk, dimension = int(dim), function = fun)
+            return render(request, self.template_name, { 'form' : form, 'fig_html' : fig_html, 'box_html': box_html, 'out1': out1, 'out2': out2 })
         else:
             return render(request, self.template_name, { 'form' : form })
             #print(Outcome.objects.get() )#get(algorithm = alg1.pk, dimension = dim, function = fun))
