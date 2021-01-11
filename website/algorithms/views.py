@@ -182,13 +182,16 @@ class CompAlgView(View):
 
             file_name1 = str(alg1.alg_file)
             file_name2 = str(alg2.alg_file)
+
             plt.clf()
+            mst.use('seaborn')
             fig = plt.figure(dpi=175)
+
             for x in [1,2]:
                 if x == 1:
-                    mean_val = szkielet.calculateConvergenceGraph("media/" + file_name1, fun, dim)
+                    mean_val = szkielet.calculateGraph("media/" + file_name1, fun, dim, 0)
                 else:
-                    mean_val = szkielet.calculateConvergenceGraph("media/" + file_name2, fun, dim)
+                    mean_val = szkielet.calculateGraph("media/" + file_name2, fun, dim, 0)
 
                 if mean_val.__len__() == 0:
                     return render(request, self.template_name, { 'form' : "Blad przy pobieraniu wynikow z archiwum" })
@@ -204,7 +207,6 @@ class CompAlgView(View):
                     plt.scatter( x_axis, y_axis, c='darkgreen', marker='o' )
                     plt.plot( x_axis, y_axis, c='darkviolet', label="error value of   " + alg2.name )
 
-            mst.use('seaborn')
             plt.title( "dim: " + dim )
             plt.xlabel("FES")
             plt.ylabel("Mean Error Value")
@@ -215,27 +217,20 @@ class CompAlgView(View):
             fig_html = mpld3.fig_to_html( fig )
 
             plt.clf()
-            # Fixing random state for reproducibility
-            np.random.seed(19680801)
 
-            # fake up some data
-            spread = np.random.rand(50) * 100
-            center = np.ones(25) * 50
-            flier_high = np.random.rand(10) * 100 + 100
-            flier_low = np.random.rand(10) * -100
-            data = np.concatenate((spread, center, flier_high, flier_low))
+            data_alg_1 = szkielet.calculateGraph("media/" + file_name1, fun, dim, 1)
+            data_alg_2 = szkielet.calculateGraph("media/" + file_name2, fun, dim, 1)
+            data_boxplot = [ data_alg_1, data_alg_2 ] 
             plt.title("Boxplot")
-            plt.boxplot(data)
+            plt.boxplot( data_boxplot, positions = [0.75,1.25], labels = [ alg1.name, alg2.name ] )
             fig = plt.gcf()
             box_html = mpld3.fig_to_html( fig )
-            #plt.show()
 
             out1 = Outcome.objects.get(algorithm = alg1.pk, dimension = int(dim), function = fun)
             out2 = Outcome.objects.get(algorithm = alg2.pk, dimension = int(dim), function = fun)
             return render(request, self.template_name, { 'form' : form, 'fig_html' : fig_html, 'box_html': box_html, 'out1': out1, 'out2': out2 })
         else:
             return render(request, self.template_name, { 'form' : form })
-            #print(Outcome.objects.get() )#get(algorithm = alg1.pk, dimension = dim, function = fun))
 
 class RankingView(ListView):
     model = Algorithm

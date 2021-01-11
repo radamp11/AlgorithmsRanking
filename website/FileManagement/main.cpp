@@ -79,15 +79,16 @@ vector<int> generateResults( string archive_name ){
 
 
 
-vector<double> calculateConvergenceGraph( string archive_name, int benchmark_number, string dimension ){  //trzeba dorobic chyba ze od razu z pliku (podaje sie nazwe pliku aby)
+vector<double> calculateGraph( string archive_name, int benchmark_number, string dimension, int option ){  //trzeba dorobic chyba ze od razu z pliku (podaje sie nazwe pliku aby)
   const int NUMBER_OF_GENERATIONS = 51, MAX_FES_TYPES = 14; //51 * 14 = 714
-  vector<double> calculated_mean_values;
+  const int CONVERGENCE_GRAPH = 0, BOX_PLOT = 1;
+  vector<double> calculated_values;
 
   if( FILE *test = fopen( archive_name.c_str(), "r" )) {
         fclose(test);
   } else {
         cerr << "archiwum nie istnieje";
-        return calculated_mean_values;
+        return calculated_values;
   }
 
 
@@ -118,22 +119,31 @@ vector<double> calculateConvergenceGraph( string archive_name, int benchmark_num
     delimiter = archive.findDelimiter();
   } catch ( string str ){
     cerr << "nie udalo sie znalezc delimitera";
-    return calculated_mean_values;
+    return calculated_values;
   }
 
   archive.extract( entry_num );
   archive.readCSVData( csv_strings, entry_num, delimiter );
-  if( csv_strings->size() != NUMBER_OF_GENERATIONS * MAX_FES_TYPES )   
-    cerr << "niepelny plik csv";
-  for( int i = 0; i < MAX_FES_TYPES; ++i ){
-    for( int j = 0; j < NUMBER_OF_GENERATIONS; ++j )
-      mean_val += stod( csv_strings->at( j + i * 51 ));
-    mean_val = mean_val / NUMBER_OF_GENERATIONS;
-    calculated_mean_values.push_back( mean_val );
+
+  if( option == BOX_PLOT ){
+    for( int i = 0; i < csv_strings->size(); ++i )
+      calculated_values.push_back( stod( csv_strings->at(i) ) );
   }
 
+  else if( option == CONVERGENCE_GRAPH ){
+    if( csv_strings->size() != NUMBER_OF_GENERATIONS * MAX_FES_TYPES )   
+      cerr << "niepelny plik csv";
+
+    for( int i = 0; i < MAX_FES_TYPES; ++i ){
+      for( int j = 0; j < NUMBER_OF_GENERATIONS; ++j )
+        mean_val += stod( csv_strings->at( j + i * 51 ));
+
+      mean_val = mean_val / NUMBER_OF_GENERATIONS;
+      calculated_values.push_back( mean_val );
+    }
+  }
   remove( archive.getEntry( entry_num ).c_str() );
-  return calculated_mean_values;                     
+  return calculated_values;
 }
 
 int main(){
@@ -150,9 +160,9 @@ BOOST_PYTHON_MODULE(szkielet)
         .def(vector_indexing_suite<std::vector<double> >());
     class_<std::vector<int> >("IntVec")
         .def(vector_indexing_suite<std::vector<int> >());
-    def("calculateConvergenceGraph", calculateConvergenceGraph);
+    def("calculateGraph", calculateGraph);
     def("generateResults", generateResults);
 }
 
-//  for(int i = 0; i < calculated_mean_values.size(); ++i )
-//    cout<<calculated_mean_values[i]<<"\n";sf
+//  for(int i = 0; i < calculated_values.size(); ++i )
+//    cout<<calculated_values[i]<<"\n";sf
