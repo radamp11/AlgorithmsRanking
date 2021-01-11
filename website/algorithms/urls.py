@@ -1,11 +1,13 @@
-from django.conf.urls import url
+#from django.conf.urls import url
 from django.urls import path
 from . import views
 
 app_name = 'algorithms'
 
 urlpatterns = [
-    url(r'^$', views.home, name='home'),
+    #url(r'^$', views.home, name='home'),
+
+    path('', views.home, name='home'),
 
     path('algorithms/', views.AlgorithmListView.as_view(), name='index'),
 
@@ -24,4 +26,6 @@ urlpatterns = [
     path('compare/', views.CompAlgView.as_view(), name='comp'),
 
     path('ranking/', views.RankingView.as_view(), name='ranking'),
+
+    path('algorithms/<pk>/failed/', views.delete, name='delete'),
 ]

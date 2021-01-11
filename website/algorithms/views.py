@@ -1,13 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
-from django.views.generic import View, ListView, DetailView
+from django.views.generic import View, ListView, DetailView, DeleteView
 from django.views.generic.edit import CreateView
 from django.core.files import File
+from django.urls import reverse_lazy
 from django.db.models import Min
 from .models import Algorithm, Outcome
 from .forms import UserForm, LoginUserForm, CompareAlgorithms
 import mpld3                            # TRZEBA ZAINSTALOWAC    
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.style as mst
 import sys
@@ -22,7 +24,9 @@ class DetailView(DetailView):
 
     def get_object(self):
         alg = super().get_object()
-
+        #return HttpResponseRedirect('algorithms:delete')
+        #return HttpResponse('<h3>elo śmieciu</h3>')
+        
         if not alg.counted:
             dims = szkielet.generateResults("media/" + str(alg.alg_file))
             if dims.__len__() == 0:
@@ -144,6 +148,14 @@ class AddAlgorithm(CreateView):
     fields = ['name', 'author', 'alg_file']
 
 
+#class DeleteAlgorithm(DeleteView):
+#    model = Algorithm
+#    success_url = reverse_lazy('algorithms:delete')
+
+def delete(request):
+    return render(request, 'algorithms/delete.html')
+
+
 def logoutView(request):
     logout(request)
     return render(request, 'algorithms/logout.html')
@@ -201,7 +213,26 @@ class CompAlgView(View):
             plt.legend()
             fig = plt.gcf()
             fig_html = mpld3.fig_to_html( fig )
-            return render(request, self.template_name, { 'form' : form, 'fig_html' : fig_html })
+
+            plt.clf()
+            # Fixing random state for reproducibility
+            np.random.seed(19680801)
+
+            # fake up some data
+            spread = np.random.rand(50) * 100
+            center = np.ones(25) * 50
+            flier_high = np.random.rand(10) * 100 + 100
+            flier_low = np.random.rand(10) * -100
+            data = np.concatenate((spread, center, flier_high, flier_low))
+            plt.title("Boxplot")
+            plt.boxplot(data)
+            fig = plt.gcf()
+            box_html = mpld3.fig_to_html( fig )
+            #plt.show()
+
+            out1 = Outcome.objects.get(algorithm = alg1.pk, dimension = int(dim), function = fun)
+            out2 = Outcome.objects.get(algorithm = alg2.pk, dimension = int(dim), function = fun)
+            return render(request, self.template_name, { 'form' : form, 'fig_html' : fig_html, 'box_html': box_html, 'out1': out1, 'out2': out2 })
         else:
             return render(request, self.template_name, { 'form' : form })
             #print(Outcome.objects.get() )#get(algorithm = alg1.pk, dimension = dim, function = fun))
@@ -212,9 +243,9 @@ class RankingView(ListView):
 
     def get_queryset(self):
         min_SE = Algorithm.objects.all().aggregate(Min('SE'))
-        #print(type(min_SE['SE__min']))
+        print(min_SE['SE__min'])
         for alg in Algorithm.objects.all():
-            print(alg.SE, min_SE['SE__min'])
+            print(alg.SE)
             alg.score = ((1 - (alg.SE - min_SE['SE__min'])/(alg.SE)) * 50)
             alg.save()
 
