@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <memory>
+#include "file.h"
 
 class Archive{
 public:
@@ -13,19 +13,18 @@ public:
     void extract( int num_of_entry );
     void sortEntries();
     bool validate();
+    std::vector<int> checkDimensions();
+
     int getNumberOfEntries();
-    std::string getEntry( int entry_num );
+    std::string getEntryName( int entry_num );
     int getYear();
-    std::vector<std::string> checkDimensions();
-    std::unique_ptr<std::string[]> separateFullName( std::string full_name );
-    void readCSVData( std::unique_ptr<std::vector<std::string>> &vec, int entry_num, std::string delimiter );
-    std::string findDelimiter();
+    File getFile( int file_num );
 
 private:
-    int cec_year;
+    int cec_year_;
     int number_of_entries_;
     std::string archive_name_;
-    std::vector<std::string> entry_name_; 
+    std::vector<File> file_;
 };
 
 #endif 

@@ -194,7 +194,7 @@ class CompAlgView(View):
             alg2 = Algorithm.objects.get(pk=request.POST['algorithm2'])
 
             fun = int(request.POST['function'])
-            dim = request.POST['dimension']
+            dim = int(request.POST['dimension'])
 
             file_name1 = str(alg1.alg_file)
             file_name2 = str(alg2.alg_file)
@@ -203,20 +203,15 @@ class CompAlgView(View):
             mst.use('seaborn')
             fig = plt.figure(dpi=175)
 
-            for x in [1, 2]:
-                if x == 1:
-                    try:
+            for x in [1,2]:
+                try:
+                    if x == 1:
                         mean_val = szkielet.calculateGraph("media/" + file_name1, fun, dim, 0)
-                    except RuntimeError as ex:
-                        return render(request, self.template_name, { 'form': form, 'error_cpp' : ex.args })
-                else:
-                    try:
+                    else:
                         mean_val = szkielet.calculateGraph("media/" + file_name2, fun, dim, 0)
-                    except RuntimeError as ex:
-                        return render(request, self.template_name, { 'form': form, 'error_cpp' : ex.args })
-
-                if mean_val.__len__() == 0:
-                    return render(request, self.template_name, {'form': form, 'error_cpp': "Blad przy pobieraniu wynikow z archiwum"})
+                    
+                except RuntimeError as ex:
+                    return render(request, self.template_name, { 'form': form, 'error_cpp' : ex.args })
 
                 # x_axis = [0.01, 0.02, 0.03, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
                 x_axis = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
@@ -231,7 +226,7 @@ class CompAlgView(View):
                     plt.scatter(x_axis, y_axis, c='darkgreen', marker='o')
                     plt.plot(x_axis, y_axis, c='darkviolet', label="error value of   " + alg2.name)
 
-            plt.title("dim: " + dim)
+            plt.title( "dim: " + str(dim) )
             plt.xlabel("FES")
             plt.ylabel("Mean Error Value")
             plt.ylim(bottom=-10)
@@ -243,9 +238,6 @@ class CompAlgView(View):
             plt.clf()
             try:
                 data_alg_1 = szkielet.calculateGraph("media/" + file_name1, fun, dim, 1)
-            except RuntimeError as ex:
-                return render(request, self.template_name, { 'form': form, 'error_cpp' : ex.args })
-            try:
                 data_alg_2 = szkielet.calculateGraph("media/" + file_name2, fun, dim, 1)
             except RuntimeError as ex:
                 return render(request, self.template_name, { 'form': form, 'error_cpp' : ex.args })

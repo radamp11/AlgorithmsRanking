@@ -2,17 +2,28 @@
 #define FILE_H
 
 #include <string>
+#include <vector>
+#include <memory>
 
 class File{
 public:
-    std::vector<std::string> checkDimensions();
-    std::unique_ptr<std::string[]> separateFullName( std::string full_name );
-    void readCSVData( std::unique_ptr<std::vector<std::string>> &vec, int entry_num, std::string delimiter );
-    std::string findDelimiter();
+    File( std::string file_name );
+    std::unique_ptr<std::string[]> separateFullName();
+    void readCSVData( std::unique_ptr<std::vector<std::string>> &vec );
+    void findDelimiter();
+
+    std::string getFileName();
+    int getFunction();
+    int getDimension();
+    std::string getDelimiter();
+    void setDelimiter( std::string del );
 
 private:
-    std::string file_name;
-    std::string delimiter;
-}
+    std::string file_name_;
+    std::string algorithm_name_;
+    int benchmark_function_;
+    int dimension_;
+    std::string delimiter_;
+};
 
-#ifndef
+#endif
