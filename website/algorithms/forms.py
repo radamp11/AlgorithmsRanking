@@ -40,4 +40,4 @@ class CompareAlgorithms(forms.Form):
 
 
 class ShowBenchmark(forms.Form):
-    benchmark = forms.ModelChoiceField(queryset = Benchmark.objects.all())
+    benchmark = forms.ModelChoiceField(queryset = Benchmark.objects.all().order_by('number'))

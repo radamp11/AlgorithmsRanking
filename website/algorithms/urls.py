@@ -24,6 +24,7 @@ urlpatterns = [
     path('logout/', views.logoutView, name='logout'),
 
     path('compare/', views.CompAlgView.as_view(), name='comp'),
+    # error dla fun 3 dim 10
 
     path('ranking/', views.RankingView.as_view(), name='ranking'),
 
