@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.db.models import Min
 from .models import Algorithm, Outcome
 from .forms import UserForm, LoginUserForm, CompareAlgorithms
-import mpld3                            # TRZEBA ZAINSTALOWAC    
+import mpld3  
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.style as mst
@@ -199,6 +199,8 @@ class CompAlgView(View):
                 #x_axis = [0.01, 0.02, 0.03, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
                 x_axis = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
                 y_axis = mean_val
+                while len(x_axis) > len(y_axis):
+                    x_axis.pop()
 
                 if x == 1:
                     plt.scatter( x_axis, y_axis, c='darkred', marker='o' )

@@ -1,6 +1,7 @@
 #include "archive.h"
 #include <string>
 #include <fstream>
+#include <algorithm>
 #include "lib/ziplib/Source/ZipLib/ZipFile.h"
 //#define CORRECT_NUMBER_OF_FILES 120
 
@@ -15,6 +16,10 @@ Archive::Archive( string archive_name ) : archive_name_(archive_name){
     entry_name_.push_back( entry->GetFullName() );
   }
 
+  if( number_of_entries_ == 120 )
+    cec_year = 2017;
+  else if( number_of_entries_ == 84 )
+    cec_year = 2013;
   sortEntries();
 }
 
@@ -62,13 +67,14 @@ string Archive::findDelimiter(){
   file.open( entry_name_[0], fstream::in );
   file.get( ch_str, 49 );
   for( int i = 0; i < 49 && !found_first; ++i ){
-      if( (int(ch_str[i]) < 48 || int(ch_str[i]) > 57) && int(ch_str[i]) != 46 && int(ch_str[i]) != 101 && int(ch_str[i]) != 43 ){  //48 and 57 is ASCII code of 0 and 9
+      if( ( ch_str[i] < '0' || ch_str[i] > '9' ) && ch_str[i] != '.' 
+      && ch_str[i] != 'e' && ch_str[i] != 'E' && ch_str[i] != '+' && ch_str[i] != '-' ){
           first = i;
           found_first = true;
       }
   }
   for( int i = first; i < 49 && !found_last; ++i ){
-      if( int(ch_str[i]) >= 48 && int(ch_str[i]) <= 57 ){
+      if( ch_str[i] >= '0' && int(ch_str[i]) <= '9' ){
         last = i;
         found_last = true;
       }
@@ -106,6 +112,7 @@ void Archive::sortEntries(){
 
 void Archive::readCSVData( unique_ptr< vector<string> > &vec, int entry_num, string delimiter ){
   fstream file;
+  const int ERROR_LIMIT = 1200;
   string temp_str, value;
   int position;
 
@@ -113,7 +120,7 @@ void Archive::readCSVData( unique_ptr< vector<string> > &vec, int entry_num, str
 
   for( int j = 0; file.good(); ++j ){
     getline( file, temp_str );
-    if(  temp_str.length() > 1200 ){
+    if( temp_str.length() > ERROR_LIMIT ){
       cerr << "blad w zapisie danych";
       return;
     }
@@ -132,19 +139,12 @@ void Archive::readCSVData( unique_ptr< vector<string> > &vec, int entry_num, str
 }
 
 bool Archive::validate(){
-  unique_ptr<string[]> separated_name, temp_name;
+  unique_ptr<string[]> separated_name;
   int num_of_fun = 0, num_of_dim = 0;
   bool counting_fun = true;
 
-  separated_name = separateFullName( entry_name_[0] );
-  for( int i = 1; counting_fun && i < number_of_entries_; ++i ){
-    temp_name = separateFullName( entry_name_[i] );
-    if( temp_name[1] == separated_name[1] ){
-      counting_fun = false;
-      num_of_fun = i;
-    }
-  }
-
+  separated_name = separateFullName( entry_name_[number_of_entries_ - 1] );
+  num_of_fun = stoi( separated_name[1] );
   num_of_dim = checkDimensions().size();
 
   if( num_of_dim * num_of_fun != number_of_entries_ )
@@ -175,4 +175,8 @@ int Archive::getNumberOfEntries(){
 
 string Archive::getEntry( int entry_num ){
   return entry_name_[entry_num];
+}
+
+int Archive::getYear(){
+  return cec_year;
 }

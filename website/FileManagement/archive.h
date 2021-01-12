@@ -19,8 +19,10 @@ public:
     std::string findDelimiter();
     int getNumberOfEntries();
     std::string getEntry( int entry_num );
+    int getYear();
 
 private:
+    int cec_year;
     int number_of_entries_;
     std::string archive_name_;
     std::vector<std::string> entry_name_; 
