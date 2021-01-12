@@ -18,11 +18,6 @@ vector<int> generateResults( string archive_name ){
   const int ONE_ROW_ENTRIES = 51;
   fstream result_file, temp_file;
 
-  if( FILE *test = fopen( archive_name.c_str(), "r" ))
-    fclose(test);
-  else 
-    throw CppException( "archiwum " + archive_name + " nie istnieje" );
-
   Archive archive( archive_name );
   if( !archive.validate() )
     throw CppException( "archiwum " + archive_name + " nie zawiera odpowiednich plikow / nie przeszlo walidacji" );
@@ -83,11 +78,6 @@ vector<double> calculateGraph( string archive_name, int benchmark_number, int di
   const int NUMBER_OF_GENERATIONS = 51; //51 * 14 = 714
   const int CONVERGENCE_GRAPH = 0, BOX_PLOT = 1;
   vector<double> calculated_values;
-
-  if( FILE *test = fopen( archive_name.c_str(), "r" ))
-        fclose(test);
-  else 
-        throw CppException( "archiwum " + archive_name + " nie istnieje" );
 
   int max_fes_types;
   Archive archive( archive_name );

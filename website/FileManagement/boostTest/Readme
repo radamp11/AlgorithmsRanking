@@ -1,0 +1,4 @@
+Do przeprowadzenia testu potrzebna jest biblioteka boost::test
+Uruchomienie testu:
+./tests --log_level=test_suite
+

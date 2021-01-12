@@ -21,7 +21,7 @@ elif(platform.system() == "Windows"):
    target = 'szkielet.pyd'
 else:
    print(platform.system() + " not supported")
-
+   
 def build_link_to_lib( target, source, env):
    '''tworzy link (symboliczny) do biblioteki - uzywany w serwerze'''
    shutil.copy( str(source[0]), str(target[0]) )
@@ -32,12 +32,14 @@ dll = e.SharedLibrary(source = objects, target = 'szkielet' )
 e.Command(target, dll, build_link_to_lib )
 
 if(platform.system() == "Linux"):
+   e2.Append( CPPPATH = ['/usr/include/python3.8'] )
    e2.Append( LIBPATH = ['/usr/local/lib'] )
-   e2.Append( LIBS = [ 'libboost_unit_test_framework ] )
+   e2.Append( LIBS = [ 'libboost_unit_test_framework', 'libzip' ] )
 
 elif(platform.system() == "Windows"):
    e2.Append( CPPFLAGS = ' /EHsc /D "WIN32" /D "_WIN32_WINNT#0x501" /D "_CONSOLE" /W4 /MD' )
    e2.Append( CPPPATH = [ 'c:/Boost/include/boost-1_74', 'C:/Python38/include' ] )
    e2.Append( LIBPATH = [ 'C:/Boost/lib', 'C:/Python38/libs', 'C:/ziplib/lib' ] )
-   
-e2.Program("test.cpp")
+
+
+e2.Program(["boostTest/tests.cpp", "archive.cpp", "file.cpp", "statistics.cpp"])
