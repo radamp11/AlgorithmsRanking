@@ -13,7 +13,7 @@
 using namespace std;
 
 vector<int> generateResults( string archive_name ){
-  const int EXPECTED_NUMBER_OF_ENTRIES = 714;
+  const int ONE_ROW_ENTRIES = 51;
   fstream result_file, temp_file;
   vector<int> int_dimensions;
 
@@ -24,37 +24,46 @@ vector<int> generateResults( string archive_name ){
         return int_dimensions;
   }
 
-
-
   Archive archive( archive_name );
   if( !archive.validate() ){
     cerr << "archiwum nie zawiera odpowiednich plikow";
     return int_dimensions;
   }
 
-
   string result_file_name, delimiter;
+  int number_of_values, in_one_row_entries;
   vector<string> dimensions = archive.checkDimensions();
+  
+  if( archive.getYear() == 2017 )     //na podstawie ilosci dimension zakladamy czy CEC2017 bedzie oblsugiwany czy jednak 2013
+  	number_of_values = 714;
+  else if ( archive.getYear() == 2013 )
+  	number_of_values = 561;
+  else
+    return int_dimensions;
+  
   unique_ptr< Statistics > stats { new Statistics() };  //TODO errorhandling
   unique_ptr< vector<string> > csv_strings { new vector<string>() };
 
   delimiter = archive.findDelimiter();
   archive.extractAll();
   for( int for_dim = 0; for_dim < dimensions.size(); ++for_dim ){
-    result_file_name = "results" + dimensions[for_dim] + ".txt";
+    result_file_name = "static/result_files/results" + dimensions[for_dim] + ".txt";
     result_file.open( result_file_name, fstream::out );
 
-    for( int i = 0 + for_dim; i < archive.getNumberOfEntries(); i += 4 ){
+    for( int i = 0 + for_dim; i < archive.getNumberOfEntries(); i += dimensions.size() ){
       archive.readCSVData( csv_strings, i, delimiter );
-
-      if( csv_strings->size() != EXPECTED_NUMBER_OF_ENTRIES ){
+      if( csv_strings->size() != number_of_values ){
         archive.removeAll();
         cerr << "pliki zawarte w archiwum sa bledne";
         return int_dimensions;
       }
 
-      for( int j = 0; j < csv_strings->size(); ++j )
+      for( int j = number_of_values - ONE_ROW_ENTRIES; j < csv_strings->size(); ++j ){  // j = 0 jak cos
         stats->insertValue( stod( csv_strings->at( j ) ));
+        cout<<csv_strings->at( j )<<" ";
+      }
+      cout<<"\n";
+      
 
       stats->calculateStatistics();
 
@@ -80,7 +89,7 @@ vector<int> generateResults( string archive_name ){
 
 
 vector<double> calculateGraph( string archive_name, int benchmark_number, string dimension, int option ){  //trzeba dorobic chyba ze od razu z pliku (podaje sie nazwe pliku aby)
-  const int NUMBER_OF_GENERATIONS = 51, MAX_FES_TYPES = 14; //51 * 14 = 714
+  const int NUMBER_OF_GENERATIONS = 51; //51 * 14 = 714
   const int CONVERGENCE_GRAPH = 0, BOX_PLOT = 1;
   vector<double> calculated_values;
 
@@ -91,8 +100,16 @@ vector<double> calculateGraph( string archive_name, int benchmark_number, string
         return calculated_values;
   }
 
-
+  int max_fes_types;
   Archive archive( archive_name );
+  if( archive.getYear() == 2017 )
+    max_fes_types = 14;
+  else if ( archive.getYear() == 2013 )
+    max_fes_types = 11;
+  else
+    return calculated_values;
+
+
   vector<string> dimensions = archive.checkDimensions();
   int dimension_idx = -1;
   for( int i = 0; i < dimensions.size(); ++i )
@@ -131,10 +148,11 @@ vector<double> calculateGraph( string archive_name, int benchmark_number, string
   }
 
   else if( option == CONVERGENCE_GRAPH ){
-    if( csv_strings->size() != NUMBER_OF_GENERATIONS * MAX_FES_TYPES )   
+    if( csv_strings->size() != NUMBER_OF_GENERATIONS * max_fes_types ){
       cerr << "niepelny plik csv";
-
-    for( int i = 0; i < MAX_FES_TYPES; ++i ){
+      return calculated_values;
+    }   
+    for( int i = 0; i < max_fes_types; ++i ){
       for( int j = 0; j < NUMBER_OF_GENERATIONS; ++j )
         mean_val += stod( csv_strings->at( j + i * 51 ));
 
