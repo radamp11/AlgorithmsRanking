@@ -27,7 +27,7 @@ class Benchmark(models.Model):
     number = models.IntegerField(default = 0)
     
     def __str__(self):
-        return self.name
+        return '{}. {}'.format(self.number, self.name)
 
 
 class Outcome(models.Model):
