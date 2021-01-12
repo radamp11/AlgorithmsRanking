@@ -13,13 +13,13 @@ public:
     void extract( int num_of_entry );
     void sortEntries();
     bool validate();
+    int getNumberOfEntries();
+    std::string getEntry( int entry_num );
+    int getYear();
     std::vector<std::string> checkDimensions();
     std::unique_ptr<std::string[]> separateFullName( std::string full_name );
     void readCSVData( std::unique_ptr<std::vector<std::string>> &vec, int entry_num, std::string delimiter );
     std::string findDelimiter();
-    int getNumberOfEntries();
-    std::string getEntry( int entry_num );
-    int getYear();
 
 private:
     int cec_year;

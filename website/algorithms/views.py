@@ -185,7 +185,10 @@ class CompAlgView(View):
 
             for x in [1, 2]:
                 if x == 1:
-                    mean_val = szkielet.calculateGraph("media/" + file_name1, fun, dim, 0)
+                    try:
+                        mean_val = szkielet.calculateGraph("media/" + file_name1, fun, dim, 0)
+                    except RuntimeError as ex:
+                        return render(request, self.template_name, { 'form' : ex.args })
                 else:
                     mean_val = szkielet.calculateGraph("media/" + file_name2, fun, dim, 0)
 
@@ -270,4 +273,9 @@ class BenchmarksView(View):
             name = bench.name
             file_path = bench.data_file_path
 
+<<<<<<< HEAD
         return render(request, self.template_name, {'form': form, 'name': name, 'file_path': file_path})
+=======
+
+        return render(request, self.template_name, { 'form' : form, 'name': name, 'file_path': file_path })
+>>>>>>> 8e8d270224f3414887fd9feff18c491f5af73586

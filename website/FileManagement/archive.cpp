@@ -3,11 +3,13 @@
 #include <fstream>
 #include <algorithm>
 #include "lib/ziplib/Source/ZipLib/ZipFile.h"
+#include "exception.h"
 //#define CORRECT_NUMBER_OF_FILES 120
 
 using namespace std;
 
 Archive::Archive( string archive_name ) : archive_name_(archive_name){
+  const int CEC2017_ENTRIES = 120, CEC2013_ENTRIES = 84;
   ZipArchive::Ptr archive = ZipFile::Open( archive_name );
   number_of_entries_ = archive->GetEntriesCount();
   
@@ -16,9 +18,9 @@ Archive::Archive( string archive_name ) : archive_name_(archive_name){
     entry_name_.push_back( entry->GetFullName() );
   }
 
-  if( number_of_entries_ == 120 )
+  if( number_of_entries_ == CEC2017_ENTRIES )
     cec_year = 2017;
-  else if( number_of_entries_ == 84 )
+  else if( number_of_entries_ == CEC2013_ENTRIES )
     cec_year = 2013;
   sortEntries();
 }
@@ -58,29 +60,30 @@ unique_ptr<string[]> Archive::separateFullName( string full_name ){
 }
 
 string Archive::findDelimiter(){
+  const int BUFFER_SIZE = 50;
   fstream file;
-  char ch_str[50];
+  char ch_str[ BUFFER_SIZE ];
   int first = -1, last = -1;
   bool found_first = false, found_last = false;
 
   extract( 0 );
   file.open( entry_name_[0], fstream::in );
-  file.get( ch_str, 49 );
-  for( int i = 0; i < 49 && !found_first; ++i ){
+  file.get( ch_str, BUFFER_SIZE - 1 );
+  for( int i = 0; i < BUFFER_SIZE - 1 && !found_first; ++i ){
       if( ( ch_str[i] < '0' || ch_str[i] > '9' ) && ch_str[i] != '.' 
       && ch_str[i] != 'e' && ch_str[i] != 'E' && ch_str[i] != '+' && ch_str[i] != '-' ){
           first = i;
           found_first = true;
       }
   }
-  for( int i = first; i < 49 && !found_last; ++i ){
+  for( int i = first; i < BUFFER_SIZE - 1 && !found_last; ++i ){
       if( ch_str[i] >= '0' && int(ch_str[i]) <= '9' ){
         last = i;
         found_last = true;
       }
   }
   if( last == -1 ){
-    throw "no_delimiter";
+    throw CppException( "W pliku " + entry_name_[0] + " nie odnaleziono delimitera" );
   }
 
   string str( ch_str );
@@ -120,10 +123,10 @@ void Archive::readCSVData( unique_ptr< vector<string> > &vec, int entry_num, str
 
   for( int j = 0; file.good(); ++j ){
     getline( file, temp_str );
-    if( temp_str.length() > ERROR_LIMIT ){
-      cerr << "blad w zapisie danych";
-      return;
-    }
+
+    if( temp_str.length() > ERROR_LIMIT )
+      throw CppException( "blad w zapisie danych dla pliku " + entry_name_[entry_num] );
+
     while( temp_str.length() > 0 ){
       position = temp_str.find( delimiter );
       if( position == string::npos )
@@ -163,7 +166,6 @@ void Archive::removeAll(){
     remove( entry_name_[i].c_str() );
   }
 }
-
 void Archive::extract( int entry_idx ){
   if( entry_idx < number_of_entries_ )
     ZipFile::ExtractFile( archive_name_, entry_name_[entry_idx], entry_name_[entry_idx] );
