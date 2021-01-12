@@ -11,6 +11,7 @@ class Algorithm(models.Model):
     counted = models.BooleanField(default = False)
     num_of_fun = models.IntegerField(default = 0)
     SE = models.FloatField(default = 0)
+    SR = models.IntegerField(default = 0)
     score1 = models.FloatField(default = 0)
     score2 = models.FloatField(default = 0)
     total_score = models.FloatField(default = 0)

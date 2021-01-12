@@ -266,18 +266,81 @@ class RankingView(ListView):
     template_name = 'algorithms/ranking.html'
 
     def get_queryset(self):
+     
+        #score2 - obliczanie SR
+        for fun_idx in range(30):
+            fun_idx = fun_idx + 1
+            num_algs_2017 = 0   # ilosc algorytmów dla danego roku CEC - czyli tez rozmiar slownika
+            num_algs_2013 = 0
+            # inicjalizacja słowników co obieg pętli
+            dict10D_2017 = {}
+            dict30D_2017 = {}
+            dict50D_2017 = {}
+            dict100D_2017 = {}
+            dict10D_2013 = {}
+            dict30D_2013 = {}
+            dict50D_2013 = {}
 
+            for alg in Algorithm.objects.all():
+                if alg.num_of_fun == 30:
+                    dict10D_2017[alg.name] = Outcome.objects.get(algorithm = alg, function = fun_idx, dimension = 10).mean_float
+                    dict30D_2017[alg.name] = Outcome.objects.get(algorithm = alg, function = fun_idx, dimension = 30).mean_float
+                    dict50D_2017[alg.name] = Outcome.objects.get(algorithm = alg, function = fun_idx, dimension = 50).mean_float
+                    dict100D_2017[alg.name] = Outcome.objects.get(algorithm = alg, function = fun_idx, dimension = 100).mean_float
+                    num_algs_2017 = num_algs_2017 + 1
+                elif alg.num_of_fun == 28 and alg.num_of_fun >= fun_idx:
+                    dict10D_2013[alg.name] = Outcome.objects.get(algorithm = alg, function = fun_idx, dimension = 10).mean_float
+                    dict30D_2013[alg.name] = Outcome.objects.get(algorithm = alg, function = fun_idx, dimension = 30).mean_float
+                    dict50D_2013[alg.name] = Outcome.objects.get(algorithm = alg, function = fun_idx, dimension = 50).mean_float
+                    num_algs_2013 = num_algs_2013 + 1
+            
+            dict10D_2017 = {k: v for k, v in sorted(dict10D_2017.items(), key=lambda item: item[1])}
+            dict30D_2017 = {k: v for k, v in sorted(dict30D_2017.items(), key=lambda item: item[1])}
+            dict50D_2017 = {k: v for k, v in sorted(dict50D_2017.items(), key=lambda item: item[1])}
+            dict100D_2017 = {k: v for k, v in sorted(dict100D_2017.items(), key=lambda item: item[1])}
+            dict10D_2013 = {k: v for k, v in sorted(dict10D_2013.items(), key=lambda item: item[1])}
+            dict30D_2013 = {k: v for k, v in sorted(dict30D_2013.items(), key=lambda item: item[1])}
+            dict50D_2013 = {k: v for k, v in sorted(dict50D_2013.items(), key=lambda item: item[1])}
+            
+            if num_algs_2017 != len(dict10D_2017):
+                print('zle policzona dlugosc slwonika')
+
+            for alg in Algorithm.objects.all():
+                # rzutowanie na listę żeby móc uzyskać index. wtedy ranga = num_algs - index
+                if alg.num_of_fun == 30:
+                    alg.SR = alg.SR + 0.1 * (num_algs_2017 - list(dict10D_2017.keys()).index(alg.name))
+                    alg.SR = alg.SR + 0.2 * (num_algs_2017 - list(dict30D_2017.keys()).index(alg.name))
+                    alg.SR = alg.SR + 0.3 * (num_algs_2017 - list(dict50D_2017.keys()).index(alg.name))
+                    alg.SR = alg.SR + 0.4 * (num_algs_2017 - list(dict100D_2017.keys()).index(alg.name))
+                    #print('sr w trakcie liczenia SR')
+                    #print(alg.SR)
+                elif alg.num_of_fun == 28 and alg.num_of_fun >= fun_idx:
+                    alg.SR = alg.SR + 0.1 * (num_algs_2013 - list(dict10D_2013.keys()).index(alg.name))
+                    alg.SR = alg.SR + 0.2 * (num_algs_2013 - list(dict30D_2013.keys()).index(alg.name))
+                    alg.SR = alg.SR + 0.3 * (num_algs_2013 - list(dict50D_2013.keys()).index(alg.name))
+                alg.save()
+
+        # koniec liczenia SR
+        
         min_SE_2017 = Algorithm.objects.filter(num_of_fun = 30).aggregate(Min('SE'))
         min_SE_2013 = Algorithm.objects.filter(num_of_fun = 28).aggregate(Min('SE'))
-        print(min_SE_2017['SE__min'])
-        print(min_SE_2013['SE__min'])
+
+        min_SR_2017 = Algorithm.objects.filter(num_of_fun = 30).aggregate(Min('SR'))
+        min_SR_2013 = Algorithm.objects.filter(num_of_fun = 28).aggregate(Min('SR'))
+            
         for alg in Algorithm.objects.all():
-            if alg.num_of_fun == 30:
-                alg.score1 = ((1 - (alg.SE - min_SE_2017['SE__min']) / (alg.SE)) * 50) 
+            # liczymy score1 i score2 i total_score
+            if alg.num_of_fun == 30: 
+                #print('sr w trakcie score')
+                #print(alg.SR)
+                alg.score1 = ((1 - (alg.SE - min_SE_2017['SE__min']) / (alg.SE)) * 50)
+                alg.score2 = ((1 - (alg.SR - min_SR_2017['SR__min']) / (alg.SR)) * 50)
             elif alg.num_of_fun == 28:
                 alg.score1 = ((1 - (alg.SE - min_SE_2013['SE__min']) / (alg.SE)) * 50)
-            alg.total_score = alg.score1 + alg.score2
+                alg.score2 = ((1 - (alg.SR - min_SR_2013['SR__min']) / (alg.SR)) * 50)
+            alg.total_score = alg.score1 + alg.score2 
             alg.save()
+
         return Algorithm.objects.order_by('-total_score')
 
         # 123zpr123
