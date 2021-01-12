@@ -1,24 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic import View, ListView, DetailView, DeleteView
 from django.views.generic.edit import CreateView
-from django.core.files import File
-from django.urls import reverse_lazy
 from django.db.models import Min
-from json import dumps
 from .models import Algorithm, Outcome, Benchmark
 from .forms import UserForm, LoginUserForm, CompareAlgorithms, ShowBenchmark
-import mpld3                            # TRZEBA ZAINSTALOWAC    
-import numpy as np
+import mpld3                          # TRZEBA ZAINSTALOWAC    
 import matplotlib.pyplot as plt
 import matplotlib.style as mst
-
-import plotly.graph_objects as go
-import plotly as py
-
-import pandas as pd
-
 import sys
 sys.path.append('../FileManagement/')
 
@@ -196,7 +185,10 @@ class CompAlgView(View):
 
             for x in [1,2]:
                 if x == 1:
-                    mean_val = szkielet.calculateGraph("media/" + file_name1, fun, dim, 0)
+                    try:
+                        mean_val = szkielet.calculateGraph("media/" + file_name1, fun, dim, 0)
+                    except RuntimeError as ex:
+                        return render(request, self.template_name, { 'form' : ex.args })
                 else:
                     mean_val = szkielet.calculateGraph("media/" + file_name2, fun, dim, 0)
 
