@@ -9,10 +9,16 @@ using namespace std;
 File::File( std::string file_name ) : file_name_(file_name){
     unique_ptr<string[]> separated_name = separateFullName();
 
-    algorithm_name_ = separated_name[0];
-    benchmark_function_ = stoi( separated_name[1] );
-    dimension_ = stoi( separated_name[2] );
+    try{
+        algorithm_name_ = separated_name[0];
+        benchmark_function_ = stoi( separated_name[1] );
+        dimension_ = stoi( separated_name[2] );
 
+    } catch ( exception stoiException ){
+        algorithm_name_ = file_name_;
+        benchmark_function_ = 0;
+        dimension_ = 0;
+    }
     
 }
 
@@ -73,7 +79,7 @@ void File::findDelimiter(){
   else 
     throw CppException( "Plik " + file_name_ + " nie istnieje / nie zostal wypakowany" );
 
-  const int BUFFER_SIZE = 50;
+  const int BUFFER_SIZE = 35;
   fstream file;
   char ch_str[ BUFFER_SIZE ];
   int first = -1, last = -1;

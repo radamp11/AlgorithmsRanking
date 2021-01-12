@@ -10,6 +10,11 @@
 using namespace std;
 
 Archive::Archive( string archive_name ) : archive_name_(archive_name){
+  if( FILE *test = fopen( archive_name.c_str(), "r" ))
+    fclose(test);
+  else 
+    throw CppException( "archiwum " + archive_name + " nie istnieje" );
+
   const int CEC2017_ENTRIES = 120, CEC2013_ENTRIES = 84;
   ZipArchive::Ptr archive = ZipFile::Open( archive_name );
   number_of_entries_ = archive->GetEntriesCount();
@@ -25,9 +30,9 @@ Archive::Archive( string archive_name ) : archive_name_(archive_name){
     cec_year_ = 2013;
 
   sortEntries();
-
-  extract( 0 );
   
+  extract( 0 );
+
   file_[0].findDelimiter();                   //zakladamy ze wszystkie pliki w archiwum maja taki sam delimiter;
   string delimiter = file_[0].getDelimiter();
   for( int i = 1; i < number_of_entries_; ++i )
@@ -61,7 +66,6 @@ void Archive::sortEntries(){
   //bubble sort
   do{
     for( int i = 0; i < number_of_entries_ - 1; ++i ){
-
       if( file_[i].getFunction() > file_[i+1].getFunction() )
         swap( file_[i], file_[i+1] );
       else if( file_[i].getFunction() == file_[i+1].getFunction() )
