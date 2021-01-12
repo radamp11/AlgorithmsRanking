@@ -16,4 +16,44 @@
 <h5><a href="{% url 'algorithms:comp' %}" class="forums_link">Przejdź do porównania algorytmów</a></h5>
 <li class="visible-xs"><a href="/" class="forums_link">Wróć do strony startowej</a></li>
 
+
+
+<div id="tester" style="width:600px;height:250px;"></div>
+
+<script>
+	TESTER = document.getElementById('tester');
+    /* /mnt/d/jSO_1_10.txt */
+    Plotly.d3.csv('../../../static/benchmark_files/message.txt', function(err, rows){
+    function unpack(rows, key) {
+    return rows.map(function(row) { return row[key]; });
+    }
+    
+    var z_data=[ ]
+    for(i=-100;i<100; i++)
+    {
+    z_data.push(unpack(rows,i));
+    }
+
+    var data = [{
+            z: z_data,
+            type: 'surface'
+            }];
+    
+    var layout = {
+    title: 'Mt Bruno Elevation',
+    autosize: false,
+    width: 500,
+    height: 500,
+    margin: {
+        l: 65,
+        r: 50,
+        b: 65,
+        t: 90,
+    }
+    };
+    Plotly.newPlot(TESTER, data, layout);
+    });
+</script>
+
+
 {% endblock %}

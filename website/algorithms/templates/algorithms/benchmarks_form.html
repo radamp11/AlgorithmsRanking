@@ -1,0 +1,70 @@
+{% extends 'algorithms/base.html' %}
+
+{% block body %}
+
+    <div class="container-fluid">
+    
+        <div class="row">
+            <div class="col-sm-12 col-md-7">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h3>Wybierz Benchmark, którego wykres chcesz zobaczyć: </h3>
+                        {% if error_message %}
+                            <p><strong>{{ error_message }}</strong></p>
+                        {% endif %}
+                        <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% include 'algorithms/form-template.html' %}
+                            <button id="demo" type="submit" class="btn btn-success">Prześlij</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tester" style="width:600px;height:250px;"></div>
+
+    {% if file_path %}
+    {{ file_path | json_script:"path" }}
+    {{ name | json_script:"benname"}}
+
+
+    <script>
+        var filee_path = JSON.parse(document.getElementById('path').textContent);
+        var namee = JSON.parse(document.getElementById('benname').textContent);
+        TESTER = document.getElementById('tester');
+        /* /mnt/d/jSO_1_10.txt */
+        Plotly.d3.csv( filee_path, function(err, rows){
+        function unpack(rows, key) {
+        return rows.map(function(row) { return row[key]; });
+        }
+        
+        var z_data=[ ]
+        for(i=-100;i<=100;i++)
+        {
+        z_data.push(unpack(rows,i));
+        }
+    
+        var data = [{
+                z: z_data,
+                type: 'surface'
+                }];
+        
+        var layout = {
+        title:  namee,
+        autosize: false,
+        width: 500,
+        height: 500,
+        margin: {
+            l: 65,
+            r: 50,
+            b: 65,
+            t: 90,
+        }
+        };
+        Plotly.newPlot(TESTER, data, layout);
+        });
+    </script>
+    {% endif %}
+{% endblock %}

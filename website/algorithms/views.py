@@ -6,12 +6,19 @@ from django.views.generic.edit import CreateView
 from django.core.files import File
 from django.urls import reverse_lazy
 from django.db.models import Min
-from .models import Algorithm, Outcome
-from .forms import UserForm, LoginUserForm, CompareAlgorithms
+from json import dumps
+from .models import Algorithm, Outcome, Benchmark
+from .forms import UserForm, LoginUserForm, CompareAlgorithms, ShowBenchmark
 import mpld3                            # TRZEBA ZAINSTALOWAC    
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.style as mst
+
+import plotly.graph_objects as go
+import plotly as py
+
+import pandas as pd
+
 import sys
 sys.path.append('../FileManagement/')
 
@@ -226,9 +233,13 @@ class CompAlgView(View):
             fig = plt.gcf()
             box_html = mpld3.fig_to_html( fig )
 
+            function = Benchmark.objects.get(number = fun)
+            fun_name = function.name
+            fun_file_path = function.data_file_path
+
             out1 = Outcome.objects.get(algorithm = alg1.pk, dimension = int(dim), function = fun)
             out2 = Outcome.objects.get(algorithm = alg2.pk, dimension = int(dim), function = fun)
-            return render(request, self.template_name, { 'form' : form, 'fig_html' : fig_html, 'box_html': box_html, 'out1': out1, 'out2': out2 })
+            return render(request, self.template_name, { 'form' : form, 'fig_html' : fig_html, 'box_html': box_html, 'out1': out1, 'out2': out2, 'fun_name': fun_name, 'fun_file_path': fun_file_path })
         else:
             return render(request, self.template_name, { 'form' : form })
 
@@ -247,3 +258,22 @@ class RankingView(ListView):
         return Algorithm.objects.order_by('score')
 
         #123zpr123
+
+class BenchmarksView(View):
+    form_class = ShowBenchmark
+    template_name = 'algorithms/benchmarks_form.html'
+    
+    def get(self, request):
+        form = self.form_class(None)
+        return render(request, self.template_name, { 'form' : form })
+    
+    # przetwarzanie wpisanych danych
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            bench = Benchmark.objects.get(pk = request.POST['benchmark'])
+            name = bench.name
+            file_path = bench.data_file_path
+
+
+        return render(request, self.template_name, { 'form' : form, 'name': name, 'file_path': file_path })

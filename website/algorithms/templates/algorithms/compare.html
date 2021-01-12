@@ -24,8 +24,52 @@
     </div>
     {% if fig_html %}
     <div>
-        <table class="table table-striped table-hover table-bordered">
+        <h4>Porównanie dla funkcji {{ fun_name }} dla wymiaru {{ out1.dimension }}</h4>
+        <div id="tester" style="width:600px;height:250px;"></div>
 
+        {{ fun_file_path | json_script:"path" }}
+        {{ fun_name | json_script:"benname"}}
+
+
+        <script>
+            var filee_path = JSON.parse(document.getElementById('path').textContent);
+            var namee = JSON.parse(document.getElementById('benname').textContent);
+            TESTER = document.getElementById('tester');
+            /* /mnt/d/jSO_1_10.txt */
+            Plotly.d3.csv( filee_path, function(err, rows){
+            function unpack(rows, key) {
+            return rows.map(function(row) { return row[key]; });
+            }
+            
+            var z_data=[ ]
+            for(i=-100;i<=100;i++)
+            {
+            z_data.push(unpack(rows,i));
+            }
+        
+            var data = [{
+                    z: z_data,
+                    type: 'surface'
+                    }];
+            
+            var layout = {
+            title:  namee,
+            autosize: false,
+            width: 500,
+            height: 500,
+            margin: {
+                l: 65,
+                r: 50,
+                b: 65,
+                t: 90,
+            }
+            };
+            Plotly.newPlot(TESTER, data, layout);
+            });
+        </script>
+        <p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p>
+        <table class="table table-striped table-hover table-bordered">
+ 
                 <tr class="table table-striped table-hover">   
                     <th>Algorithm</th>
                     <th>Best</th>
@@ -59,5 +103,6 @@
     {% endif %}
     <div> {{ fig_html | safe }} </div>
     <div> {{ box_html | safe }} </div>
+    <div> {{ d3d_html | safe }} </div>
  
 {% endblock %}

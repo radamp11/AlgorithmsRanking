@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User 
 from django import forms
-from .models import Algorithm
+from .models import Algorithm, Benchmark
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 class UserForm(forms.ModelForm):
@@ -37,3 +37,7 @@ class CompareAlgorithms(forms.Form):
     ("100", "100"), 
     )
     dimension = forms.ChoiceField(choices = CHOICES)
+
+
+class ShowBenchmark(forms.Form):
+    benchmark = forms.ModelChoiceField(queryset = Benchmark.objects.all())

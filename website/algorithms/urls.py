@@ -28,4 +28,6 @@ urlpatterns = [
     path('ranking/', views.RankingView.as_view(), name='ranking'),
 
     path('algorithms/<pk>/failed/', views.delete, name='delete'),
+
+    path('benchmarks/', views.BenchmarksView.as_view(), name='benchmark'),
 ]

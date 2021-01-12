@@ -21,6 +21,15 @@ class Algorithm(models.Model):
         return '{} : {}'.format(self.name, self.author)
 
 
+class Benchmark(models.Model):
+    name = models.CharField(max_length = 40, unique = True)
+    data_file_path = models.CharField(max_length = 60, unique = True)
+    number = models.IntegerField(default = 0)
+    
+    def __str__(self):
+        return self.name
+
+
 class Outcome(models.Model):
     algorithm = models.ForeignKey(Algorithm, on_delete = models.CASCADE)
     dimension = models.IntegerField()
