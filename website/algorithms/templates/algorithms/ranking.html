@@ -2,19 +2,47 @@
 
 {% block body %}
 {% if object_list %}
+    <h4>Ranking dla CEC2017</h4>
     <table class="table table-striped table-hover table-bordered">
         <tr class="table table-striped table-hover">
             <th><h5>Nazwa algorytmu</h5></th>
             <th><h5>Autor</h5></th>
-            <th><h5>Wynik</h5></th>
+            <th><h5>Wynik1</h5></th>
+            <th><h5>Wynik2</h5></th>
+            <th><h5>Wynik Całkowity</h5></th>
         </tr>
         {% for alg in object_list %}
+        {% if alg.num_of_fun == 30 %}
             <tr class="table table-striped table-hover">
                 <td><h5><a href="{% url 'algorithms:detail' alg.id %}">{{ alg.name }}</a></h5></td>
                 <td><h5>{{ alg.author }}</h5></td>
-                <td><h5>{{ alg.score }}</h5></td>
+                <td><h5>{{ alg.score1 }}</h5></td>
+                <td><h5>{{ alg.score2 }}</h5></td>
+                <td><h5>{{ alg.total_score }}</h5></td>
             </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
 
+    <h4>Ranking dla CEC2013</h4>
+    <table class="table table-striped table-hover table-bordered">
+        <tr class="table table-striped table-hover">
+            <th><h5>Nazwa algorytmu</h5></th>
+            <th><h5>Autor</h5></th>
+            <th><h5>Wynik1</h5></th>
+            <th><h5>Wynik2</h5></th>
+            <th><h5>Wynik Całkowity</h5></th>
+        </tr>
+        {% for alg in object_list %}
+        {% if alg.num_of_fun == 28 %}
+            <tr class="table table-striped table-hover">
+                <td><h5><a href="{% url 'algorithms:detail' alg.id %}">{{ alg.name }}</a></h5></td>
+                <td><h5>{{ alg.author }}</h5></td>
+                <td><h5>{{ alg.score1 }}</h5></td>
+                <td><h5>{{ alg.score2 }}</h5></td>
+                <td><h5>{{ alg.total_score }}</h5></td>
+            </tr>
+        {% endif %}
         {% endfor %}
     </table>
 

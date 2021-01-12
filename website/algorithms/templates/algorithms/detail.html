@@ -3,7 +3,7 @@
 {% block body %}
 {% load static %}
 
-{% if algorithm.id is not None %}
+{% if algorithm.id is not None and err_message is None %}
     <h3>ID: {{ algorithm.id }} </h3>
     <h3>Nazwa: {{ algorithm.name }}  </h3>
     <h3>Autor: {{ algorithm.author }} </h3>
@@ -37,8 +37,10 @@
         <li class="visible-xs"><a href="/algorithms/" class="forums_link">Powrót</a></li>
 {% else %}
     <h3>Coś poszło nie tak z dodaniem Twojego algorytmu.</h3>
+    <h3>Kod błędu: {{ err_message }}</h3>
     <h3>Upewnij się, że Twój plik .zip spełnia wymagania i spróbuj ponownie.</h3>
     <a href="{% url 'algorithms:home' %}">Wróć do strony głównej</a>
+
 {% endif %}
 
 {% endblock %}

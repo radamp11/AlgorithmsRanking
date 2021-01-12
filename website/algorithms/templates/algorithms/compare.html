@@ -22,6 +22,9 @@
             </div>
         </div>
     </div>
+    {% if error_cpp %}
+        <h3>Coś poszło nie tak. Kod błędu: {{ error_cpp }}</h3>
+    {% endif %}
     {% if fig_html %}
     <div>
         <h4>Porównanie dla funkcji {{ fun_name }} dla wymiaru {{ out1.dimension }}</h4>
