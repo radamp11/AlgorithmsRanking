@@ -183,26 +183,15 @@ class CompAlgView(View):
             mst.use('seaborn')
             fig = plt.figure(dpi=175)
 
-<<<<<<< HEAD
             for x in [1,2]:
                 try:
                     if x == 1:
-=======
-            for x in [1, 2]:
-                if x == 1:
-                    try:
->>>>>>> 8e9fa17960ead2c965da7e21077a82ad05dc87af
                         mean_val = szkielet.calculateGraph("media/" + file_name1, fun, dim, 0)
                     else:
                         mean_val = szkielet.calculateGraph("media/" + file_name2, fun, dim, 0)
 
-<<<<<<< HEAD
                 except RuntimeError as ex:
                     return render(request, self.template_name, { 'form' : ex.args })
-=======
-                if mean_val.__len__() == 0:
-                    return render(request, self.template_name, {'form': "Blad przy pobieraniu wynikow z archiwum"})
->>>>>>> 8e9fa17960ead2c965da7e21077a82ad05dc87af
 
                 # x_axis = [0.01, 0.02, 0.03, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
                 x_axis = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
@@ -217,11 +206,7 @@ class CompAlgView(View):
                     plt.scatter(x_axis, y_axis, c='darkgreen', marker='o')
                     plt.plot(x_axis, y_axis, c='darkviolet', label="error value of   " + alg2.name)
 
-<<<<<<< HEAD
             plt.title( "dim: " + str(dim) )
-=======
-            plt.title("dim: " + dim)
->>>>>>> 8e9fa17960ead2c965da7e21077a82ad05dc87af
             plt.xlabel("FES")
             plt.ylabel("Mean Error Value")
             plt.ylim(bottom=-10)
@@ -231,7 +216,7 @@ class CompAlgView(View):
             fig_html = mpld3.fig_to_html(fig)
 
             plt.clf()
-<<<<<<< HEAD
+            
             try:
                 data_alg_1 = szkielet.calculateGraph("media/" + file_name1, fun, dim, 1)
                 data_alg_2 = szkielet.calculateGraph("media/" + file_name2, fun, dim, 1)
@@ -239,12 +224,6 @@ class CompAlgView(View):
                 return render(request, self.template_name, { 'form' : ex.args })
                 
             data_boxplot = [ data_alg_1, data_alg_2 ] 
-=======
-
-            data_alg_1 = szkielet.calculateGraph("media/" + file_name1, fun, dim, 1)
-            data_alg_2 = szkielet.calculateGraph("media/" + file_name2, fun, dim, 1)
-            data_boxplot = [data_alg_1, data_alg_2]
->>>>>>> 8e9fa17960ead2c965da7e21077a82ad05dc87af
             plt.title("Boxplot")
             plt.boxplot(data_boxplot, positions=[0.75, 1.25], labels=[alg1.name, alg2.name])
             fig = plt.gcf()
@@ -254,17 +233,11 @@ class CompAlgView(View):
             fun_name = function.name
             fun_file_path = function.data_file_path
 
-<<<<<<< HEAD
-            out1 = Outcome.objects.get(algorithm = alg1.pk, dimension = dim, function = fun)
-            out2 = Outcome.objects.get(algorithm = alg2.pk, dimension = dim, function = fun)
-            return render(request, self.template_name, { 'form' : form, 'fig_html' : fig_html, 'box_html': box_html, 'out1': out1, 'out2': out2, 'fun_name': fun_name, 'fun_file_path': fun_file_path })
-=======
             out1 = Outcome.objects.get(algorithm=alg1.pk, dimension=int(dim), function=fun)
             out2 = Outcome.objects.get(algorithm=alg2.pk, dimension=int(dim), function=fun)
             return render(request, self.template_name,
                           {'form': form, 'fig_html': fig_html, 'box_html': box_html, 'out1': out1, 'out2': out2,
                            'fun_name': fun_name, 'fun_file_path': fun_file_path})
->>>>>>> 8e9fa17960ead2c965da7e21077a82ad05dc87af
         else:
             return render(request, self.template_name, {'form': form})
 
@@ -302,9 +275,5 @@ class BenchmarksView(View):
             name = bench.name
             file_path = bench.data_file_path
 
-<<<<<<< HEAD
-        return render(request, self.template_name, {'form': form, 'name': name, 'file_path': file_path})
-=======
 
         return render(request, self.template_name, { 'form' : form, 'name': name, 'file_path': file_path })
->>>>>>> 8e8d270224f3414887fd9feff18c491f5af73586
