@@ -1,21 +1,13 @@
-Szkielet programu "Serwis do rankingowania algorytmow"
+Program "Serwis do rankingowania algorytmow"
 Adam Stec, Jakub Kowalczyk
 
-
-OPIS:
-Szkielet w aktualnej wersji posiada zalazek funkcjonalnosci naszego serwisu. Jest to aplikacja zbudowana w Django, ktora korzysta z modulow napisanych w jezyku C++. Aktualnie udostepnione funkcjonalnosci: 
-1.rozpakowywanie archiwum zip oraz czytanie plikow .txt (main.cpp)
-2.rysowanie wykresow na podstawie odczytanych wartosci z plikow .txt (main.py)
-3.przykladowy test jednostkowy (testJednostkowy/)
-4.strone internetowa (website/)
-Obecnie strona internetowa zawiera tylko aplikację /algorithms/ , w której są dostępne algorytmy zapisane w domyślnej bazie danych Django (sqlite3), oraz dla jednego z nich wyświetlany jest przykładowy wykres. Na razie nie korzystaliśmy w niej z kodu w języku C++. Dodatkowo jest dostepna na serwerze pod domena http://radamp.pythonanywhere.com/algorithms/ 
-
+Opis: Program umozliwiajacy proste porownywanie algorytmow ewolucyjnych.
+Zostal on stworzony z mysla o testowaniu rozwiazan z CEC2017 lecz moze byc uzywany przy innego rodzaju porownaniach.
 
 REPOZYTORIUM:
 https://github.com/radamp11/AlgorithmsRanking.git
 
-
-BIBLIOTEKI I NARZEDZIA:
+WYMAGANE BIBLIOTEKI I NARZEDZIA:
 boost.python
 boost.test
 ziplib
@@ -24,7 +16,7 @@ scons
 matplotlib
 
 
-INSTALACJA I URUCHOMIENIE:
+INSTALACJA I URUCHOMIENIE UBUNTU 20.04:
 1. "$ sudo apt install g++"
 2. "$ sudo apt-get install python3-dev"
 
