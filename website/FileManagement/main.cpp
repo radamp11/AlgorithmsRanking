@@ -146,7 +146,7 @@ void translate(CppException const& ex)
 {
     PyErr_SetString(PyExc_RuntimeError, ex.getPythonInfo().c_str() );
 }
-BOOST_PYTHON_MODULE(szkielet)
+BOOST_PYTHON_MODULE(serwis)
 {
     register_exception_translator<CppException>(&translate);
     class_<std::vector<double> >("DoubleVec")

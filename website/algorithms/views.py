@@ -13,7 +13,7 @@ import sys
 
 sys.path.append('../FileManagement/')
 
-from FileManagement import szkielet
+from FileManagement import serwis
 
 
 class DetailView(DetailView):
@@ -26,7 +26,7 @@ class DetailView(DetailView):
         err_message = None
         if not alg.counted:
             try:
-                error = szkielet.generateResults("media/" + str(alg.alg_file))
+                error = serwis.generateResults("media/" + str(alg.alg_file))
             except RuntimeError as ex:
                 err_message = ex.args
             context['err_message'] = err_message
@@ -40,7 +40,7 @@ class DetailView(DetailView):
 
         if not alg.counted:
             try:
-                dims = szkielet.generateResults("media/" + str(alg.alg_file))
+                dims = serwis.generateResults("media/" + str(alg.alg_file))
             except RuntimeError as ex:
                 #message = ex.args 
                 #print('wywaliło wyjatek')
@@ -206,9 +206,9 @@ class CompAlgView(View):
             for x in [1,2]:
                 try:
                     if x == 1:
-                        mean_val = szkielet.calculateGraph("media/" + file_name1, fun, dim, 0)
+                        mean_val = serwis.calculateGraph("media/" + file_name1, fun, dim, 0)
                     else:
-                        mean_val = szkielet.calculateGraph("media/" + file_name2, fun, dim, 0)
+                        mean_val = serwis.calculateGraph("media/" + file_name2, fun, dim, 0)
                     
                 except RuntimeError as ex:
                     return render(request, self.template_name, { 'form': form, 'error_cpp' : ex.args })
@@ -237,8 +237,8 @@ class CompAlgView(View):
 
             plt.clf()
             try:
-                data_alg_1 = szkielet.calculateGraph("media/" + file_name1, fun, dim, 1)
-                data_alg_2 = szkielet.calculateGraph("media/" + file_name2, fun, dim, 1)
+                data_alg_1 = serwis.calculateGraph("media/" + file_name1, fun, dim, 1)
+                data_alg_2 = serwis.calculateGraph("media/" + file_name2, fun, dim, 1)
             except RuntimeError as ex:
                 return render(request, self.template_name, { 'form': form, 'error_cpp' : ex.args })
             
@@ -266,7 +266,11 @@ class RankingView(ListView):
     template_name = 'algorithms/ranking.html'
 
     def get_queryset(self):
-     
+        
+        for alg in Algorithm.objects.all():  # zerujemy poprzednio wyliczoną wartośc
+            alg.SR = 0
+            alg.save() 
+            
         #score2 - obliczanie SR
         for fun_idx in range(30):
             fun_idx = fun_idx + 1
@@ -281,7 +285,7 @@ class RankingView(ListView):
             dict30D_2013 = {}
             dict50D_2013 = {}
 
-            for alg in Algorithm.objects.all():
+            for alg in Algorithm.objects.all():    
                 if alg.num_of_fun == 30:
                     dict10D_2017[alg.name] = Outcome.objects.get(algorithm = alg, function = fun_idx, dimension = 10).mean_float
                     dict30D_2017[alg.name] = Outcome.objects.get(algorithm = alg, function = fun_idx, dimension = 30).mean_float
@@ -293,6 +297,7 @@ class RankingView(ListView):
                     dict30D_2013[alg.name] = Outcome.objects.get(algorithm = alg, function = fun_idx, dimension = 30).mean_float
                     dict50D_2013[alg.name] = Outcome.objects.get(algorithm = alg, function = fun_idx, dimension = 50).mean_float
                     num_algs_2013 = num_algs_2013 + 1
+                alg.save()
             
             dict10D_2017 = {k: v for k, v in sorted(dict10D_2017.items(), key=lambda item: item[1])}
             dict30D_2017 = {k: v for k, v in sorted(dict30D_2017.items(), key=lambda item: item[1])}
@@ -306,18 +311,18 @@ class RankingView(ListView):
                 print('zle policzona dlugosc slwonika')
 
             for alg in Algorithm.objects.all():
-                # rzutowanie na listę żeby móc uzyskać index. wtedy ranga = num_algs - index
+                # rzutowanie na listę żeby móc uzyskać index. wtedy ranga =  index + 1
                 if alg.num_of_fun == 30:
-                    alg.SR = alg.SR + 0.1 * (num_algs_2017 - list(dict10D_2017.keys()).index(alg.name))
-                    alg.SR = alg.SR + 0.2 * (num_algs_2017 - list(dict30D_2017.keys()).index(alg.name))
-                    alg.SR = alg.SR + 0.3 * (num_algs_2017 - list(dict50D_2017.keys()).index(alg.name))
-                    alg.SR = alg.SR + 0.4 * (num_algs_2017 - list(dict100D_2017.keys()).index(alg.name))
-                    #print('sr w trakcie liczenia SR')
-                    #print(alg.SR)
+                    alg.SR = alg.SR + 0.1 * (list(dict10D_2017.keys()).index(alg.name) + 1)
+                    alg.SR = alg.SR + 0.2 * (list(dict30D_2017.keys()).index(alg.name) + 1)
+                    alg.SR = alg.SR + 0.3 * (list(dict50D_2017.keys()).index(alg.name) + 1)
+                    alg.SR = alg.SR + 0.4 * (list(dict100D_2017.keys()).index(alg.name) + 1)
                 elif alg.num_of_fun == 28 and alg.num_of_fun >= fun_idx:
-                    alg.SR = alg.SR + 0.1 * (num_algs_2013 - list(dict10D_2013.keys()).index(alg.name))
-                    alg.SR = alg.SR + 0.2 * (num_algs_2013 - list(dict30D_2013.keys()).index(alg.name))
-                    alg.SR = alg.SR + 0.3 * (num_algs_2013 - list(dict50D_2013.keys()).index(alg.name))
+                    alg.SR = alg.SR + 0.1 * (list(dict10D_2013.keys()).index(alg.name) + 1)
+                    alg.SR = alg.SR + 0.2 * (list(dict30D_2013.keys()).index(alg.name) + 1)
+                    alg.SR = alg.SR + 0.3 * (list(dict50D_2013.keys()).index(alg.name) + 1)
+                    print('sr w trakcie liczenia SR')
+                    print(alg.SR)
                 alg.save()
 
         # koniec liczenia SR
