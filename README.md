@@ -8,7 +8,7 @@ Zostal on stworzony z mysla o testowaniu rozwiazan z CEC2017 i CEC2013. (Dalsza 
 Implementacja zakladala podzial programu na czesc C++, ktora obsluguje archiwa zip i odczyt danych z plikow,
 oraz na czesc Python, ktora zajmuje sie obliczeniami, tworzeniem grafow, obsluga strony.
 
-Pliki C++ znajduja sie w folderze FileManagement
+Pliki C++ znajduja sie w folderze FileManagement.   
 Pliki Python glownie w folderze algorithms
 
 # Przyklady
